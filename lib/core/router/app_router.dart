@@ -10,6 +10,7 @@ import '../../features/profile/screens/settings_screen.dart';
 import '../../features/profile/screens/profile_screen.dart';
 import '../../features/diagnosis/screens/diagnosis_screen.dart';
 import '../../features/diagnosis/screens/diagnosis_history_screen.dart';
+import '../../features/garden/screens/garden_screen.dart';
 import '../widgets/scaffold_with_nav_bar.dart';
 import '../../core/storage/secure_storage.dart';
 
@@ -95,7 +96,7 @@ final appRouterProvider = Provider<GoRouter>((ref) {
               GoRoute(
                 path: '/garden',
                 name: 'garden',
-                builder: (context, state) => const _ComingSoon(title: 'Vuon cay'),
+                builder: (context, state) => const GardenScreen(),
               ),
             ],
           ),
