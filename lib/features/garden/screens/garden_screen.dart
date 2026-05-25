@@ -6,6 +6,9 @@ import '../providers/garden_provider.dart';
 import '../models/garden_model.dart';
 import '../widgets/garden_form_bottom_sheet.dart';
 import '../widgets/confirm_delete_dialog.dart';
+import 'garden_detail_screen.dart';
+import '../../../core/widgets/custom_header.dart';
+import '../../../core/widgets/app_popup_menu.dart';
 
 class GardenScreen extends ConsumerStatefulWidget {
   const GardenScreen({super.key});
@@ -16,19 +19,26 @@ class GardenScreen extends ConsumerStatefulWidget {
 
 class _GardenScreenState extends ConsumerState<GardenScreen> {
   @override
+  void initState() {
+    super.initState();
+    // Đợi widget dựng xong thì kiểm tra dữ liệu
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final gardenState = ref.read(gardenProvider);
+      // Nếu danh sách vườn đang trống (do vừa login hoặc mới cài app), tự động load
+      if (gardenState.gardens.isEmpty) {
+        ref.read(gardenProvider.notifier).loadGardens();
+      }
+    });
+  }
+  @override
   Widget build(BuildContext context) {
     final gardenState = ref.watch(gardenProvider);
 
     return Scaffold(
-      backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        centerTitle: true,
-        title: Text(
-          'Vườn cây của tôi',
-          style: AppTextStyles.heading2.copyWith(color: Colors.white),
-        ),
+      backgroundColor: AppColors.background,
+      appBar: CustomHeader(
+        title: 'Vườn cây của tôi',
+        showBackButton: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.add, color: Colors.white, size: 28),
@@ -63,11 +73,24 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
   }
 
   Widget _buildGardenCard(BuildContext context, GardenModel garden) {
-    return Card(
+    return GestureDetector(
+      onTap: () => Navigator.push(
+        context,
+        MaterialPageRoute(builder: (_) => GardenDetailScreen(garden: garden)),
+      ),
+      child: Container(
       margin: const EdgeInsets.only(bottom: 16),
-      elevation: 2,
-      shape: RoundedRectangleBorder(
+      decoration: BoxDecoration(
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.shade200),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.03),
+            blurRadius: 10,
+            offset: const Offset(0, 2),
+          ),
+        ],
       ),
       clipBehavior: Clip.antiAlias,
       child: Column(
@@ -154,22 +177,7 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
                   ),
                 ),
                 // Nhan ... (More options)
-                PopupMenuButton<String>(
-                  icon: Container(
-                    padding: const EdgeInsets.all(4),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.05),
-                          blurRadius: 4,
-                          spreadRadius: 1,
-                        )
-                      ]
-                    ),
-                    child: const Icon(Icons.more_vert, size: 20),
-                  ),
+                AppPopupMenu(
                   onSelected: (value) {
                     if (value == 'edit') {
                       _showGardenForm(context, garden);
@@ -177,27 +185,9 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
                       _showDeleteDialog(context, garden.id);
                     }
                   },
-                  itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-                    const PopupMenuItem<String>(
-                      value: 'edit',
-                      child: Row(
-                        children: [
-                          Icon(Icons.edit_outlined, size: 20, color: Colors.blue),
-                          SizedBox(width: 8),
-                          Text('Sửa'),
-                        ],
-                      ),
-                    ),
-                    const PopupMenuItem<String>(
-                      value: 'delete',
-                      child: Row(
-                        children: [
-                          Icon(Icons.delete_outline, size: 20, color: Colors.red),
-                          SizedBox(width: 8),
-                          Text('Xóa', style: TextStyle(color: Colors.red)),
-                        ],
-                      ),
-                    ),
+                  items: const [
+                    AppPopupMenuItemData(value: 'edit', icon: Icons.edit_outlined, label: 'Sửa', color: Colors.blue),
+                    AppPopupMenuItemData(value: 'delete', icon: Icons.delete_outline, label: 'Xóa', color: Colors.red, isDestructive: true),
                   ],
                 ),
               ],
@@ -205,14 +195,18 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
           ),
         ],
       ),
-    );
-  }
+    ),
+  ); // dong GestureDetector
+}
 
   void _showGardenForm(BuildContext context, GardenModel? garden) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
+      enableDrag: true,
+      isDismissible: true,
+      useSafeArea: true,
       builder: (context) => GardenFormBottomSheet(garden: garden),
     );
   }
@@ -223,8 +217,8 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
       builder: (context) => ConfirmDeleteDialog(
         title: 'Xác nhận xóa vườn',
         content: 'Bạn có chắc chắn muốn xóa vườn này không?\nHành động này không thể hoàn tác.',
-        onConfirm: () {
-          ref.read(gardenProvider.notifier).deleteGarden(gardenId);
+        onConfirm: () async {
+          await ref.read(gardenProvider.notifier).deleteGarden(gardenId);
         },
       ),
     );

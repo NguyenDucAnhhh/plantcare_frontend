@@ -5,13 +5,12 @@ class ApiConstants {
 
   // Tu dong chon URL dung theo nen tang
   // kIsWeb          -> Chrome     -> localhost:8080
-  // Android Emulator -> 10.0.2.2:8080 (localhost cua may tinh)
-  // Dien thoai that -> PHONE_IP:8080 (IP Wifi cua may tinh)
+  // Android Emulator -> 192.168.0.193:8080 
+  // Dien thoai that -> 192.168.0.193:8080 (IP Wifi cua may tinh)
   //
   // De test tren dien thoai that, chay:
   //   flutter run --dart-define=PHONE_IP=192.168.x.x
-  // Sau khi chay "ipconfig" va lay IPv4 Address
-  static const String _phoneIp = String.fromEnvironment('PHONE_IP', defaultValue: '10.0.2.2');
+  static const String _phoneIp = String.fromEnvironment('PHONE_IP', defaultValue: '192.168.0.193');
 
   static String get baseUrl {
     if (kIsWeb) return 'http://localhost:8080';
@@ -33,9 +32,6 @@ class ApiConstants {
   static const String gardens = '/api/gardens';
 
   // === PLANT ===
-  // Them cay: /api/gardens/{gardenId}/plants
-  // Lay cay: /api/gardens/{gardenId}/plants
-  // Sua/Xoa cay: /api/plants/{plantId}
   static const String plantsInGarden = '/api/gardens'; // + /{id}/plants
   static const String plants = '/api/plants';           // + /{id}
 
@@ -47,11 +43,9 @@ class ApiConstants {
   static const String posts = '/api/posts';
 
   // === COMMENT ===
-  // /api/posts/{postId}/comments
   static const String commentsOfPost = '/api/posts'; // + /{id}/comments
 
   // === LIKE ===
-  // /api/posts/{postId}/like
   static const String likePost = '/api/posts'; // + /{id}/like
 
   // === NOTIFICATION ===
@@ -62,7 +56,7 @@ class ApiConstants {
   static const String diagnosisHistory = '/api/diagnosis/history';
 
   // === WEATHER ===
-  static const String weather = '/api/weather';
+  static const String weather = '/api/weather/current';
 
   // === CARE TIPS ===
   static const String careTips = '/api/care-tips';

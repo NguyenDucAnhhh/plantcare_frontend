@@ -58,6 +58,12 @@ dependencies:
 
   # === TAO MA QR ===
   qr_flutter: ^4.1.0
+  intl: ^0.20.2
+  firebase_core: ^4.9.0
+  firebase_messaging: ^16.2.2
+  flutter_local_notifications: ^21.0.0
+  timeago: ^3.7.1
+  geolocator: ^14.0.2
 
   # === THONG BAO (Chi hoat dong tren Android/iOS, khong chay tren Web) ===
   # flutter_local_notifications: ^17.2.2

@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "681763569863",
+    "project_id": "plantcare-a2e7e",
+    "storage_bucket": "plantcare-a2e7e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:681763569863:android:2a42a2e11c43807898bee2",
+        "android_client_info": {
+          "package_name": "com.example.plantcare"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCmMN7f1QC66Bwz5dqIT_QFfc0xdIxXkvY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

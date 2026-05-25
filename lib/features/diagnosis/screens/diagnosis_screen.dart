@@ -7,6 +7,7 @@ import 'package:dio/dio.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/network/api_client.dart';
+import '../../../core/widgets/custom_header.dart';
 
 class DiagnosisScreen extends ConsumerStatefulWidget {
   const DiagnosisScreen({super.key});
@@ -70,14 +71,9 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        title: const Text(
-          'Chẩn đoán bệnh AI',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+      appBar: CustomHeader(
+        title: 'Chẩn đoán bệnh AI',
+        showBackButton: false,
         actions: [
           IconButton(
             icon: const Icon(Icons.history, color: Colors.white),

@@ -59,6 +59,34 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
   }
+
+  Future<bool> changePassword(String oldPassword, String newPassword) async {
+    try {
+      await _repository.changePassword(oldPassword, newPassword);
+      return true;
+    } catch (e) {
+      return false;
+    }
+  }
+
+  Future<void> updateNotificationSettings(bool notifyAll, bool notifyCommunity, bool notifyReminder, bool notifySystem) async {
+    try {
+      await _repository.updateNotificationSettings(notifyAll, notifyCommunity, notifyReminder, notifySystem);
+      
+      if (state.profile != null) {
+        final updatedProfile = Map<String, dynamic>.from(state.profile!);
+        updatedProfile['notifyAll'] = notifyAll;
+        updatedProfile['notifyCommunity'] = notifyCommunity;
+        updatedProfile['notifyReminder'] = notifyReminder;
+        updatedProfile['notifySystem'] = notifySystem;
+        
+        state = state.copyWith(profile: updatedProfile);
+      }
+    } catch (e) {
+      // Handle error or throw
+      rethrow;
+    }
+  }
 }
 
 final profileRepositoryProvider = Provider((ref) => ProfileRepository());

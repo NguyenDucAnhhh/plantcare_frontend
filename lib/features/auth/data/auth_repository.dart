@@ -5,7 +5,7 @@ import '../../../core/storage/secure_storage.dart';
 import '../models/auth_response.dart';
 
 /// Lop giao tiep voi Spring Boot - Chi lam dung 1 viec: Goi API
-class AuthRepository {
+class AuthRepository{
   final Dio _dio = ApiClient.instance;
 
   /// Dang ky tai khoan moi
@@ -47,5 +47,34 @@ class AuthRepository {
   /// Dang xuat - Xoa Token khoi ket sat
   Future<void> logout() async {
     await SecureStorage.clear();
+  }
+
+  /// Gui FCM Token len Server
+  Future<void> updateFcmToken(String fcmToken) async {
+    try {
+      await _dio.put(
+        '/api/users/fcm-token',
+        data: {'fcmToken': fcmToken},
+      );
+    } catch (e) {
+      print('Loi gui FCM Token: $e');
+    }
+  }
+
+  /// QUEN MAT KHAU
+  Future<void> forgotPassword(String email) async {
+    await _dio.post('/api/auth/forgot-password', data: {'email': email});
+  }
+
+  Future<void> verifyOtp(String email, String otp) async {
+    await _dio.post('/api/auth/verify-otp', data: {'email': email, 'otp': otp});
+  }
+
+  Future<void> resetPassword(String email, String otp, String newPassword) async {
+    await _dio.post('/api/auth/reset-password', data: {
+      'email': email,
+      'otp': otp,
+      'newPassword': newPassword,
+    });
   }
 }

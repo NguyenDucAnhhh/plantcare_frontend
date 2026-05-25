@@ -46,7 +46,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
 
   Future<void> _pickImage() async {
     final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
+    final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (image != null) {
       setState(() {
         _localImagePath = image.path;
@@ -80,7 +80,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
     }
 
     if (success && mounted) {
-      Navigator.pop(context); // Dong bottom sheet sau khi thanh cong
+      Navigator.pop(context);
     }
   }
 
@@ -92,13 +92,13 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       padding: EdgeInsets.only(
-        top: 24,
+        top: 16,
         left: 24,
         right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24, // Day ui len khi ban phim mo
+        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
       ),
       child: Form(
         key: _formKey,
@@ -107,27 +107,45 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Drag Handle
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+              ),
+
               // Tieu de + Nut Close
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(
-                    isUpdate ? 'Cập nhật vườn' : 'Thêm vườn mới',
-                    style: AppTextStyles.heading2,
+                  Expanded(
+                    child: Text(
+                      isUpdate ? 'Cập nhật vườn' : 'Thêm vườn mới',
+                      style: AppTextStyles.heading2,
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                   IconButton(
                     icon: const Icon(Icons.close),
                     onPressed: () => Navigator.pop(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 24),
 
               // Ten vuon
               _buildLabel('Tên vườn *'),
               _buildTextField(
                 controller: _nameCtrl,
-                hint: isUpdate ? 'VD: Vườn ban công' : 'VD: Vườn ban công',
+                hint: 'VD: Vườn ban công',
                 validator: (v) => v!.isEmpty ? 'Vui lòng nhập tên vườn' : null,
               ),
 
@@ -148,7 +166,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
 
               // Anh vuon
               _buildLabel('Ảnh vườn'),
-              const SizedBox(height: 8),
+              const SizedBox(height: 4),
               GestureDetector(
                 onTap: _pickImage,
                 child: Container(
@@ -170,16 +188,16 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
 
               if (gardenState.error != null)
                 Padding(
-                  padding: const EdgeInsets.only(bottom: 16.0),
+                  padding: const EdgeInsets.only(bottom: 12),
                   child: Text(
                     gardenState.error!,
-                    style: AppTextStyles.body.copyWith(color: AppColors.error),
+                    style: TextStyle(color: AppColors.error),
                   ),
                 ),
 
               // Nut submit
               AppButton(
-                label: isUpdate ? 'Cập nhật vườn' : 'Thêm vườn',
+                label: isUpdate ? 'Lưu thay đổi' : 'Thêm vườn',
                 isLoading: gardenState.isLoading,
                 onPressed: _submitForm,
               ),
@@ -192,7 +210,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
 
   Widget _buildLabel(String text) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 8.0, top: 16.0),
+      padding: const EdgeInsets.only(top: 16, bottom: 8),
       child: Text(
         text,
         style: AppTextStyles.body.copyWith(fontWeight: FontWeight.w600),
@@ -270,7 +288,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.5),
+            color: Colors.black.withOpacity(0.55),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.close, color: Colors.white, size: 16),

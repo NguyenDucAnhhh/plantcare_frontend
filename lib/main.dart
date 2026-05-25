@@ -3,7 +3,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/constants/app_colors.dart';
 import 'core/router/app_router.dart';
 
-void main() {
+import 'package:firebase_core/firebase_core.dart';
+import 'core/services/notification_service.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
+  // Khởi tạo Firebase
+  await Firebase.initializeApp();
+  
+  // Khởi tạo dịch vụ thông báo
+  final notificationService = NotificationService();
+  await notificationService.init();
+
   runApp(
     // ProviderScope: "Nha may" Riverpod - Bat buoc phai boc ngoai cung
     const ProviderScope(

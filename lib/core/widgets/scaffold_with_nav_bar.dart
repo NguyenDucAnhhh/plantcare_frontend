@@ -48,43 +48,45 @@ class ScaffoldWithNavBar extends StatelessWidget {
                   onTap: () => _goBranch(0),
                 ),
                 _navItem(
-                  icon: Icons.article_outlined,
-                  activeIcon: Icons.article,
-                  label: 'Bài đăng',
+                  icon: Icons.people_outline,
+                  activeIcon: Icons.people,
+                  label: 'Cộng đồng',
                   isActive: navigationShell.currentIndex == 1,
                   onTap: () => _goBranch(1),
                 ),
                 // Nut trung tam: Chan doan
-                GestureDetector(
-                  onTap: () => _goBranch(2),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: navigationShell.currentIndex == 2 ? Colors.white : AppColors.primary,
-                          shape: BoxShape.circle,
-                          border: navigationShell.currentIndex == 2 
-                            ? Border.all(color: AppColors.primary, width: 2) 
-                            : null,
+                Expanded(
+                  child: GestureDetector(
+                    onTap: () => _goBranch(2),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: navigationShell.currentIndex == 2 ? Colors.white : AppColors.primary,
+                            shape: BoxShape.circle,
+                            border: navigationShell.currentIndex == 2 
+                              ? Border.all(color: AppColors.primary, width: 2) 
+                              : null,
+                          ),
+                          child: Icon(
+                            Icons.biotech_outlined, 
+                            color: navigationShell.currentIndex == 2 ? AppColors.primary : Colors.white, 
+                            size: 26
+                          ),
                         ),
-                        child: Icon(
-                          Icons.document_scanner_outlined, 
-                          color: navigationShell.currentIndex == 2 ? AppColors.primary : Colors.white, 
-                          size: 26
+                        const SizedBox(height: 4),
+                        Text(
+                          'Chẩn đoán',
+                          style: AppTextStyles.body.copyWith(
+                            fontSize: 11, 
+                            color: navigationShell.currentIndex == 2 ? AppColors.primary : AppColors.textGrey,
+                            fontWeight: navigationShell.currentIndex == 2 ? FontWeight.bold : FontWeight.w400,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Chẩn đoán',
-                        style: AppTextStyles.body.copyWith(
-                          fontSize: 11, 
-                          color: navigationShell.currentIndex == 2 ? AppColors.primary : AppColors.textGrey,
-                          fontWeight: navigationShell.currentIndex == 2 ? FontWeight.bold : FontWeight.w400,
-                        ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
                 _navItem(
@@ -117,23 +119,25 @@ class ScaffoldWithNavBar extends StatelessWidget {
     required VoidCallback onTap,
   }) {
     final color = isActive ? AppColors.primary : AppColors.textGrey;
-    return GestureDetector(
-      onTap: onTap,
-      behavior: HitTestBehavior.opaque,
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(isActive ? activeIcon : icon, color: color, size: 26),
-          const SizedBox(height: 4),
-          Text(
-            label,
-            style: AppTextStyles.body.copyWith(
-              fontSize: 11,
-              color: color,
-              fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        behavior: HitTestBehavior.opaque,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(isActive ? activeIcon : icon, color: color, size: 26),
+            const SizedBox(height: 4),
+            Text(
+              label,
+              style: AppTextStyles.body.copyWith(
+                fontSize: 11,
+                color: color,
+                fontWeight: isActive ? FontWeight.w700 : FontWeight.w400,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

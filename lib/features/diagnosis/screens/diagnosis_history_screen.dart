@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/widgets/custom_header.dart';
 import '../providers/diagnosis_history_provider.dart';
+import 'diagnosis_history_detail_screen.dart';
 
 class DiagnosisHistoryScreen extends ConsumerWidget {
   const DiagnosisHistoryScreen({super.key});
@@ -14,18 +16,9 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
 
     return Scaffold(
       backgroundColor: Colors.grey.shade50,
-      appBar: AppBar(
-        backgroundColor: AppColors.primary,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
-        title: const Text(
-          'Lịch sử chuẩn đoán',
-          style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
-        ),
-        centerTitle: true,
+      appBar: const CustomHeader(
+        title: 'Lịch sử chuẩn đoán',
+        showBackButton: true,
       ),
       body: historyAsync.when(
         data: (data) {
@@ -39,7 +32,7 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
               itemCount: data.length,
               itemBuilder: (context, index) {
                 final item = data[index] as Map<String, dynamic>;
-                return _buildHistoryCard(item);
+                return _buildHistoryCard(context, item);
               },
             ),
           );
@@ -62,7 +55,7 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
     );
   }
 
-  Widget _buildHistoryCard(Map<String, dynamic> data) {
+  Widget _buildHistoryCard(BuildContext context, Map<String, dynamic> data) {
     final confidence = (data['confidenceScore'] ?? 0).toDouble();
     String severityLabel;
     Color badgeColor;
@@ -88,17 +81,25 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
       dateStr = '${dateStr.substring(8, 10)}/${dateStr.substring(5, 7)}/${dateStr.substring(0, 4)}';
     }
 
-    return Card(
-      elevation: 0,
-      margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-        side: BorderSide(color: Colors.grey.shade300),
-      ),
-      color: Colors.white,
-      child: Padding(
-        padding: const EdgeInsets.all(12.0),
-        child: Row(
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).push(
+          MaterialPageRoute(
+            builder: (_) => DiagnosisHistoryDetailScreen(result: data),
+          ),
+        );
+      },
+      child: Card(
+        elevation: 0,
+        margin: const EdgeInsets.only(bottom: 16),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(color: Colors.grey.shade300),
+        ),
+        color: Colors.white,
+        child: Padding(
+          padding: const EdgeInsets.all(12.0),
+          child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Anh benh
@@ -193,6 +194,7 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
             ),
           ],
         ),
+      ),
       ),
     );
   }

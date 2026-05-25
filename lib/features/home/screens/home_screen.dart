@@ -6,6 +6,8 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../providers/weather_provider.dart';
 import '../data/weather_model.dart';
+import '../../notification/providers/notification_provider.dart';
+import '../../post/widgets/post_form_bottom_sheet.dart';
 
 class HomeScreen extends ConsumerWidget {
   const HomeScreen({super.key});
@@ -52,11 +54,7 @@ class HomeScreen extends ConsumerWidget {
   ) {
     return Container(
       decoration: const BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [Color(0xFF2E7D32), Color(0xFF43A047)],
-        ),
+        color: AppColors.primary,
         borderRadius: BorderRadius.only(
           bottomLeft: Radius.circular(0),
           bottomRight: Radius.circular(0),
@@ -86,26 +84,42 @@ class HomeScreen extends ConsumerWidget {
                   ),
                   const Spacer(),
 
-                  // Icon chuong thong bao (co cham do)
-                  Stack(
-                    children: [
-                      IconButton(
-                        icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 26),
-                        onPressed: () {},
-                      ),
-                      Positioned(
-                        top: 8,
-                        right: 8,
-                        child: Container(
-                          width: 8,
-                          height: 8,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
-                            shape: BoxShape.circle,
+                  // Icon chuong thong bao (co cham do hoac so)
+                  Consumer(
+                    builder: (context, ref, child) {
+                      final unreadCount = ref.watch(notificationProvider).unreadCount;
+                      return Stack(
+                        children: [
+                          IconButton(
+                            icon: const Icon(Icons.notifications_outlined, color: Colors.white, size: 26),
+                            onPressed: () {
+                              ref.read(notificationProvider.notifier).loadNotifications();
+                              context.push('/notifications');
+                            },
                           ),
-                        ),
-                      ),
-                    ],
+                          if (unreadCount > 0)
+                            Positioned(
+                              top: 6,
+                              right: 6,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.red,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Text(
+                                  unreadCount > 9 ? '9+' : '$unreadCount',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                        ],
+                      );
+                    },
                   ),
 
                   // Icon cai dat
@@ -218,7 +232,7 @@ class HomeScreen extends ConsumerWidget {
             // Nut xanh duong: Chuan doan benh
             _buildActionCard(
               label: 'Chuẩn đoán bệnh',
-              icon: Icons.search_rounded,
+              icon: Icons.biotech_rounded,
               backgroundColor: AppColors.accentBlue,
               iconColor: Colors.white,
               labelColor: Colors.white,
@@ -232,7 +246,14 @@ class HomeScreen extends ConsumerWidget {
               backgroundColor: AppColors.accentPurple,
               iconColor: Colors.white,
               labelColor: Colors.white,
-              onTap: () => context.go('/posts'),
+              onTap: () {
+                showModalBottomSheet(
+                  context: context,
+                  isScrollControlled: true,
+                  backgroundColor: Colors.transparent,
+                  builder: (_) => const PostFormBottomSheet(),
+                );
+              },
             ),
 
             // Nut trang: Quan ly vuon

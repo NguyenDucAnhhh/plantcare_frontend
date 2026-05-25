@@ -1,12 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:plantcare/features/garden/providers/garden_provider.dart';
+import 'package:plantcare/features/garden/providers/plant_provider.dart';
+import 'package:plantcare/features/home/providers/weather_provider.dart';
+import 'package:plantcare/features/post/providers/comment_provider.dart';
+import 'package:plantcare/features/post/providers/post_provider.dart';
+import 'package:plantcare/features/profile/providers/public_profile_provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/storage/secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../providers/profile_provider.dart';
 import '../../diagnosis/providers/diagnosis_history_provider.dart';
+import '../../../core/widgets/custom_header.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -16,8 +23,83 @@ class SettingsScreen extends ConsumerStatefulWidget {
 }
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
-  bool _pushNotification = true;
-  bool _emailNotification = false;
+  bool _allNotifications = true;
+  bool _careNotifications = true;
+  bool _communityNotifications = true;
+
+  @override
+  void initState() {
+    super.initState();
+    // Use addPostFrameCallback to safely read provider after initial build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadSettings();
+    });
+  }
+
+  void _loadSettings() {
+    final profileState = ref.read(profileProvider);
+    final profile = profileState.profile;
+    
+    if (profile != null) {
+      setState(() {
+        _allNotifications = profile['notifyAll'] ?? true;
+        _careNotifications = profile['notifyReminder'] ?? true;
+        _communityNotifications = profile['notifyCommunity'] ?? true;
+      });
+    }
+  }
+
+  Future<void> _saveSettings() async {
+    // Luu tren thiet bi (optional, de filter nhanh cho local notifications)
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('all_notifications', _allNotifications);
+    await prefs.setBool('care_notifications', _careNotifications);
+    await prefs.setBool('community_notifications', _communityNotifications);
+    
+    // Luu len backend
+    try {
+      await ref.read(profileProvider.notifier).updateNotificationSettings(
+        _allNotifications,
+        _communityNotifications,
+        _careNotifications,
+        true, // notifySystem
+      );
+    } catch (e) {
+      debugPrint('Loi luu settings len backend: $e');
+    }
+  }
+
+  void _onToggleAllNotifications(bool val) {
+    setState(() {
+      _allNotifications = val;
+      if (val) {
+        _careNotifications = true;
+        _communityNotifications = true;
+      } else {
+        _careNotifications = false;
+        _communityNotifications = false;
+      }
+    });
+    _saveSettings();
+  }
+
+  void _onToggleChildNotification(bool val, bool isCare) {
+    setState(() {
+      if (isCare) {
+        _careNotifications = val;
+      } else {
+        _communityNotifications = val;
+      }
+      
+      // Update master toggle based on children
+      if (_careNotifications || _communityNotifications) {
+        _allNotifications = true;
+      } else {
+        _allNotifications = false;
+      }
+    });
+    _saveSettings();
+  }
 
   void _showLogoutDialog() {
     showDialog(
@@ -43,12 +125,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ElevatedButton(
               onPressed: () async {
                 // Thuc hien dang xuat
-                await SecureStorage.clear();
-                
+                await ref.read(authProvider.notifier).logout();
+
                 // Reset toan bo state cua cac provider de tranh luu cache cua user cu
                 ref.invalidate(authProvider);
                 ref.invalidate(profileProvider);
                 ref.invalidate(diagnosisHistoryProvider);
+                ref.invalidate(weatherProvider);
+                ref.invalidate(gardenProvider);
+                ref.invalidate(plantProvider);
+                ref.invalidate(commentProvider);
+                ref.invalidate(postProvider);
+                ref.invalidate(publicProfileProvider);
 
                 // Chuyen thang ve login
                 if (context.mounted) {
@@ -89,16 +177,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.background,
-      appBar: AppBar(
-        backgroundColor: const Color(0xFF343A40), // Mau toi nhu Figma
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.white),
-          onPressed: () => context.pop(),
-        ),
-        title: Text(
-          'Cài đặt',
-          style: AppTextStyles.heading3.copyWith(color: Colors.white),
-        ),
+      appBar: const CustomHeader(
+        title: 'Cài đặt',
+        showBackButton: true,
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(20),
@@ -117,7 +198,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               _buildListTile(
                 icon: Icons.lock_outline,
                 title: 'Đổi mật khẩu',
-                onTap: () {},
+                onTap: () => context.push('/change-password'),
               ),
             ]),
             const SizedBox(height: 24),
@@ -126,19 +207,27 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _buildSectionTitle('THÔNG BÁO'),
             _buildSectionCard([
               _buildSwitchTile(
-                icon: Icons.notifications_none,
-                title: 'Thông báo đẩy',
-                subtitle: 'Nhận thông báo về hoạt động',
-                value: _pushNotification,
-                onChanged: (val) => setState(() => _pushNotification = val),
+                icon: Icons.notifications_active_outlined,
+                title: 'Thông báo',
+                subtitle: 'Bật/tắt tất cả thông báo',
+                value: _allNotifications,
+                onChanged: _onToggleAllNotifications,
               ),
               const Divider(height: 1, indent: 48, endIndent: 16),
               _buildSwitchTile(
-                icon: Icons.notifications_none,
-                title: 'Thông báo email',
-                subtitle: 'Nhận email về cập nhật',
-                value: _emailNotification,
-                onChanged: (val) => setState(() => _emailNotification = val),
+                icon: Icons.calendar_month_outlined,
+                title: 'Thông báo lịch chăm sóc',
+                subtitle: 'Nhắc nhở tưới nước, bón phân...',
+                value: _careNotifications,
+                onChanged: (val) => _onToggleChildNotification(val, true),
+              ),
+              const Divider(height: 1, indent: 48, endIndent: 16),
+              _buildSwitchTile(
+                icon: Icons.people_outline,
+                title: 'Thông báo cộng đồng',
+                subtitle: 'Lượt thích, bình luận mới...',
+                value: _communityNotifications,
+                onChanged: (val) => _onToggleChildNotification(val, false),
               ),
             ]),
             const SizedBox(height: 24),
