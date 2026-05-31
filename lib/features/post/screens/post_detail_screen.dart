@@ -45,6 +45,11 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     super.dispose();
   }
 
+  Future<void> _onRefresh() async {
+    await ref.read(postProvider.notifier).loadPostById(widget.postId);
+    await ref.read(commentProvider(widget.postId).notifier).loadComments();
+  }
+
   @override
   Widget build(BuildContext context) {
     final postsState = ref.watch(postProvider);
@@ -148,8 +153,12 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
       body: Column(
         children: [
           Expanded(
-            child: SingleChildScrollView(
-              child: Column(
+            child: RefreshIndicator(
+              onRefresh: _onRefresh,
+              color: AppColors.primary,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   // Bai dang
