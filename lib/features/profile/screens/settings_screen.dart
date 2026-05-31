@@ -127,21 +127,24 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 // Thuc hien dang xuat
                 await ref.read(authProvider.notifier).logout();
 
-                // Reset toan bo state cua cac provider de tranh luu cache cua user cu
-                ref.invalidate(authProvider);
-                ref.invalidate(profileProvider);
-                ref.invalidate(diagnosisHistoryProvider);
-                ref.invalidate(weatherProvider);
-                ref.invalidate(gardenProvider);
-                ref.invalidate(plantProvider);
-                ref.invalidate(commentProvider);
-                ref.invalidate(postProvider);
-                ref.invalidate(publicProfileProvider);
-
-                // Chuyen thang ve login
+                // Chuyen thang ve login TRUOC KHI invalidate de tranh race condition
                 if (context.mounted) {
                   context.go('/login');
                 }
+
+                // Reset toan bo state cua cac provider SAU KHI chuyen trang
+                // (delay de chac chan cac man hinh cu da bi huy, tranh viec Provider tu dong load lai)
+                Future.delayed(const Duration(milliseconds: 200), () {
+                  ref.invalidate(authProvider);
+                  ref.invalidate(profileProvider);
+                  ref.invalidate(diagnosisHistoryProvider);
+                  ref.invalidate(weatherProvider);
+                  ref.invalidate(gardenProvider);
+                  ref.invalidate(plantProvider);
+                  ref.invalidate(commentProvider);
+                  ref.invalidate(postProvider);
+                  ref.invalidate(publicProfileProvider);
+                });
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.error,
