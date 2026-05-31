@@ -5,7 +5,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../providers/garden_provider.dart';
 import '../models/garden_model.dart';
 import '../widgets/garden_form_bottom_sheet.dart';
-import '../widgets/confirm_delete_dialog.dart';
+import '../../../core/widgets/confirm_delete_dialog.dart';
 import 'garden_detail_screen.dart';
 import '../../../core/widgets/custom_header.dart';
 import '../../../core/widgets/app_popup_menu.dart';
@@ -182,7 +182,7 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
                     if (value == 'edit') {
                       _showGardenForm(context, garden);
                     } else if (value == 'delete') {
-                      _showDeleteDialog(context, garden.id);
+                      _showDeleteDialog(context, garden);
                     }
                   },
                   items: const [
@@ -211,14 +211,14 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
     );
   }
 
-  void _showDeleteDialog(BuildContext context, int gardenId) {
+  void _showDeleteDialog(BuildContext context, GardenModel garden) {
     showDialog(
       context: context,
       builder: (context) => ConfirmDeleteDialog(
         title: 'Xác nhận xóa vườn',
-        content: 'Bạn có chắc chắn muốn xóa vườn này không?\nHành động này không thể hoàn tác.',
+        content: 'Bạn có chắc chắn muốn xóa vườn ${garden.name} không?\nTất cả cây trong vườn cũng sẽ bị xóa. Hành động này không thể hoàn tác.',
         onConfirm: () async {
-          await ref.read(gardenProvider.notifier).deleteGarden(gardenId);
+          await ref.read(gardenProvider.notifier).deleteGarden(garden.id);
         },
       ),
     );

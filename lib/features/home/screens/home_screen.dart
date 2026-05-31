@@ -274,7 +274,7 @@ class HomeScreen extends ConsumerWidget {
               backgroundColor: AppColors.surface,
               iconColor: AppColors.warning,
               labelColor: AppColors.textDark,
-              onTap: () => context.go('/tips'),
+              onTap: () => context.push('/tips'),
               hasBorder: true,
             ),
           ],

@@ -6,8 +6,14 @@ import 'package:image_picker/image_picker.dart';
 import 'package:dio/dio.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/widgets/app_button.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../../core/network/api_client.dart';
 import '../../../core/widgets/custom_header.dart';
+// import '../providers/diagnosis_provider.dart';
+import '../providers/diagnosis_history_provider.dart';
+// import '../models/diagnosis_result_model.dart';
 
 class DiagnosisScreen extends ConsumerStatefulWidget {
   const DiagnosisScreen({super.key});
@@ -21,6 +27,7 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
   bool _isAnalyzing = false;
   XFile? _selectedImage;
   Map<String, dynamic>? _result;
+  int _userFeedbackRating = 0;
 
   Future<void> _pickAndAnalyze(ImageSource source) async {
     final XFile? image = await _picker.pickImage(
@@ -34,6 +41,7 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
       _selectedImage = image;
       _isAnalyzing = true;
       _result = null;
+      _userFeedbackRating = 0;
     });
 
     try {
@@ -49,12 +57,7 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
     } catch (e) {
       setState(() => _isAnalyzing = false);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Lỗi phân tích: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        AppSnackbar.showError(context, ErrorMapper.parseError(e));
       }
     }
   }
@@ -64,7 +67,21 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
       _selectedImage = null;
       _result = null;
       _isAnalyzing = false;
+      _userFeedbackRating = 0;
     });
+  }
+
+  Future<void> _rate(int rating) async {
+    if (_result == null || _result!['id'] == null) return;
+    
+    final success = await ref.read(diagnosisHistoryProvider.notifier)
+        .rateDiagnosis(_result!['id'], rating);
+    if (success && mounted) {
+      setState(() {
+        _userFeedbackRating = rating;
+      });
+      AppSnackbar.showSuccess(context, 'Cảm ơn bạn đã đánh giá!');
+    }
   }
 
   @override
@@ -250,16 +267,6 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
   // ============================================================
   Widget _buildResultCard(Map<String, dynamic> result) {
     final confidence = (result['confidenceScore'] ?? 0).toDouble();
-    final Color severityColor = confidence >= 80
-        ? Colors.red.shade600
-        : confidence >= 50
-            ? Colors.orange.shade700
-            : Colors.green.shade600;
-    final String severityLabel = confidence >= 80
-        ? 'Nghiêm trọng'
-        : confidence >= 50
-            ? 'Trung bình'
-            : 'Nhẹ';
 
     return Column(
       children: [
@@ -328,17 +335,6 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
                         ],
                       ),
                     ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: severityColor.withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        severityLabel,
-                        style: TextStyle(color: severityColor, fontWeight: FontWeight.w600, fontSize: 12),
-                      ),
-                    ),
                   ],
                 ),
                 const Divider(height: 24),
@@ -349,7 +345,28 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
 
                 // Cach chua
                 _buildInfoRow(Icons.healing_outlined, 'Cách chữa', result['treatment'] ?? 'Không xác định'),
-                const SizedBox(height: 20),
+                
+                const SizedBox(height: 24),
+                const Divider(),
+                const SizedBox(height: 16),
+                
+                // Rating Area
+                Center(
+                  child: Text(
+                    'Bạn thấy chẩn đoán này có chính xác không?',
+                    style: AppTextStyles.body.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    _buildRateBtn(Icons.thumb_up_alt_rounded, 'Chính xác', 1, Colors.green),
+                    const SizedBox(width: 16),
+                    _buildRateBtn(Icons.thumb_down_alt_rounded, 'Không đúng', -1, Colors.red),
+                  ],
+                ),
+                const SizedBox(height: 24),
 
                 // Nut chuan doan lai
                 SizedBox(
@@ -391,6 +408,38 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildRateBtn(IconData icon, String label, int rateValue, Color color) {
+    final isSelected = _userFeedbackRating == rateValue;
+    return InkWell(
+      onTap: () => _rate(rateValue),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? color.withOpacity(0.1) : Colors.white,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? color : Colors.grey.shade300,
+            width: isSelected ? 2 : 1,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, color: isSelected ? color : Colors.grey.shade600, size: 20),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: AppTextStyles.body.copyWith(
+                color: isSelected ? color : Colors.grey.shade700,
+                fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 

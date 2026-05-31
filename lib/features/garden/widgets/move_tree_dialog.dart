@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../models/plant_model.dart';
 import '../models/garden_model.dart';
 import '../providers/plant_provider.dart';
@@ -93,12 +94,7 @@ class _MoveTreeDialogState extends ConsumerState<MoveTreeDialog> {
                             .movePlant(widget.plant.id, _selectedGardenId!);
                         if (success && context.mounted) {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Chuyển cây thành công!'),
-                              backgroundColor: AppColors.primary,
-                            ),
-                          );
+                          AppSnackbar.showSuccess(context, 'Chuyển cây thành công!');
                         }
                       },
                 style: ElevatedButton.styleFrom(

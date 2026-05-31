@@ -37,17 +37,29 @@ class ProfileRepository {
   }
 
   Future<List<dynamic>> getUserPosts(String userId) async {
-    // Currently backend doesn't have an endpoint for specific user's posts, 
-    // but usually it's /api/users/{id}/posts or we filter from all posts.
-    // I will mock this by getting all and filtering, or return empty if not supported
     try {
-        final response = await _dio.get('/api/posts');
-        final List<dynamic> allPosts = response.data;
-        return allPosts.where((p) => p['authorId'].toString() == userId).toList();
+        final response = await _dio.get('/api/posts/user/$userId');
+        return response.data;
     } catch(e) {
         return [];
     }
   }
+
+  Future<List<dynamic>> searchUsers(String keyword) async {
+    try {
+      final response = await _dio.get(
+        '/api/users/search',
+        queryParameters: {'keyword': keyword},
+      );
+      if (response.data != null) {
+        return response.data as List<dynamic>;
+      }
+      return [];
+    } catch (e) {
+      throw Exception('Lỗi khi tìm kiếm người dùng: $e');
+    }
+  }
+
 
   Future<void> toggleFollow(String userId) async {
     await _dio.post(

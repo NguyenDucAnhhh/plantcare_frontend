@@ -190,12 +190,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             _buildSectionTitle('TÀI KHOẢN'),
             _buildSectionCard([
               _buildListTile(
-                icon: Icons.person_outline,
-                title: 'Hồ sơ cá nhân',
-                onTap: () {},
-              ),
-              const Divider(height: 1, indent: 48, endIndent: 16),
-              _buildListTile(
                 icon: Icons.lock_outline,
                 title: 'Đổi mật khẩu',
                 onTap: () => context.push('/change-password'),

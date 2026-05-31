@@ -101,7 +101,18 @@ class _PublicProfileScreenState extends ConsumerState<PublicProfileScreen> {
                               firstImage,
                               fit: BoxFit.cover,
                             )
-                          : const Center(child: Icon(Icons.image, color: Colors.grey)),
+                          : Container(
+                              padding: const EdgeInsets.all(8.0),
+                              alignment: Alignment.center,
+                              color: Colors.white,
+                              child: Text(
+                                post.content,
+                                maxLines: 4,
+                                overflow: TextOverflow.ellipsis,
+                                style: const TextStyle(fontSize: 12, color: Colors.black87),
+                                textAlign: TextAlign.center,
+                              ),
+                            ),
                     ),
                   );
                 },

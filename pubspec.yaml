@@ -64,6 +64,9 @@ dependencies:
   flutter_local_notifications: ^21.0.0
   timeago: ^3.7.1
   geolocator: ^14.0.2
+  flutter_quill: ^11.5.0
+  flutter_localizations:
+    sdk: flutter
 
   # === THONG BAO (Chi hoat dong tren Android/iOS, khong chay tren Web) ===
   # flutter_local_notifications: ^17.2.2

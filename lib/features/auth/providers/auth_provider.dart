@@ -1,5 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../core/storage/secure_storage.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../data/auth_repository.dart';
 import '../models/auth_response.dart';
 import '../../../core/services/notification_service.dart';
@@ -139,18 +142,11 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Dich ma loi tu Spring Boot sang tieng Viet de hien thi cho User
   String _parseError(DioException e) {
-    final statusCode = e.response?.statusCode;
+    final errorCode = e.response?.data?['error'];
     final serverMessage = e.response?.data?['message'];
 
-    if (serverMessage != null) return serverMessage;
-
-    return switch (statusCode) {
-      400 => 'Thong tin khong hop le. Vui long kiem tra lai.',
-      401 => 'Email hoac mat khau khong dung.',
-      409 => 'Email nay da duoc su dung.',
-      500 => 'Loi may chu. Vui long thu lai sau.',
-      _ => 'Khong co ket noi mang (${e.message}).',
-    };
+    // Su dung ErrorMapper tap trung cho toan bo he thong (Cach 1)
+    return ErrorMapper.getErrorMessage(errorCode, serverMessage);
   }
 }
 

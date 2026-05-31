@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/custom_bottom_sheet_form.dart';
 import '../models/garden_model.dart';
 import '../providers/garden_provider.dart';
 
@@ -89,120 +89,69 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
     final isUpdate = widget.garden != null;
     final gardenState = ref.watch(gardenProvider);
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        top: 16,
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Form(
+    return CustomBottomSheetForm(
+      title: isUpdate ? 'Cập nhật vườn' : 'Thêm vườn mới',
+      actionLabel: isUpdate ? 'Lưu thay đổi' : 'Thêm vườn',
+      onActionPressed: _submitForm,
+      isActionLoading: gardenState.isLoading,
+      content: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Drag Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Ten vuon
+            _buildLabel('Tên vườn *'),
+            _buildTextField(
+              controller: _nameCtrl,
+              hint: 'VD: Vườn ban công',
+              validator: (v) => v!.isEmpty ? 'Vui lòng nhập tên vườn' : null,
+            ),
+
+            // Mo ta
+            _buildLabel('Mô tả'),
+            _buildTextField(
+              controller: _descCtrl,
+              hint: 'Mô tả về vườn...',
+              maxLines: 3,
+            ),
+
+            // Vi tri
+            _buildLabel('Vị trí'),
+            _buildTextField(
+              controller: _locCtrl,
+              hint: 'VD: Ban công tầng 2',
+            ),
+
+            // Anh vuon
+            _buildLabel('Ảnh vườn'),
+            const SizedBox(height: 4),
+            GestureDetector(
+              onTap: _pickImage,
+              child: Container(
+                width: double.infinity,
+                height: 180,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade50,
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(
                     color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
+                    style: BorderStyle.solid,
                   ),
                 ),
+                clipBehavior: Clip.antiAlias,
+                child: _buildImagePreview(),
               ),
-
-              // Tieu de + Nut Close
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      isUpdate ? 'Cập nhật vườn' : 'Thêm vườn mới',
-                      style: AppTextStyles.heading2,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 24),
-
-              // Ten vuon
-              _buildLabel('Tên vườn *'),
-              _buildTextField(
-                controller: _nameCtrl,
-                hint: 'VD: Vườn ban công',
-                validator: (v) => v!.isEmpty ? 'Vui lòng nhập tên vườn' : null,
-              ),
-
-              // Mo ta
-              _buildLabel('Mô tả'),
-              _buildTextField(
-                controller: _descCtrl,
-                hint: 'Mô tả về vườn...',
-                maxLines: 3,
-              ),
-
-              // Vi tri
-              _buildLabel('Vị trí'),
-              _buildTextField(
-                controller: _locCtrl,
-                hint: 'VD: Ban công tầng 2',
-              ),
-
-              // Anh vuon
-              _buildLabel('Ảnh vườn'),
-              const SizedBox(height: 4),
-              GestureDetector(
-                onTap: _pickImage,
-                child: Container(
-                  width: double.infinity,
-                  height: 180,
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade50,
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: Colors.grey.shade300,
-                      style: BorderStyle.solid,
-                    ),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: _buildImagePreview(),
+            ),
+            
+            if (gardenState.error != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 12),
+                child: Text(
+                  gardenState.error!,
+                  style: TextStyle(color: AppColors.error),
                 ),
               ),
-              const SizedBox(height: 24),
-
-              if (gardenState.error != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(
-                    gardenState.error!,
-                    style: TextStyle(color: AppColors.error),
-                  ),
-                ),
-
-              // Nut submit
-              AppButton(
-                label: isUpdate ? 'Lưu thay đổi' : 'Thêm vườn',
-                isLoading: gardenState.isLoading,
-                onPressed: _submitForm,
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );

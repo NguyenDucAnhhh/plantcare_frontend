@@ -11,7 +11,7 @@ import '../providers/garden_provider.dart';
 import '../widgets/garden_form_bottom_sheet.dart';
 import '../widgets/plant_form_bottom_sheet.dart';
 import '../widgets/move_tree_dialog.dart';
-import '../widgets/confirm_delete_dialog.dart';
+import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../providers/reminder_provider.dart';
 import '../models/reminder_model.dart';
 import '../widgets/reminder_form_bottom_sheet.dart';
@@ -78,10 +78,25 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
                   backgroundColor: Colors.transparent,
                   builder: (context) => GardenFormBottomSheet(garden: currentGarden),
                 );
+              } else if (val == 'delete') {
+                showDialog(
+                  context: context,
+                  builder: (_) => ConfirmDeleteDialog(
+                    title: 'Xác nhận xóa vườn',
+                    content: 'Bạn có chắc chắn muốn xóa vườn ${currentGarden.name} không?\nTất cả cây trong vườn cũng sẽ bị xóa. Hành động này không thể hoàn tác.',
+                    onConfirm: () async {
+                      final success = await ref.read(gardenProvider.notifier).deleteGarden(currentGarden.id);
+                      if (success && context.mounted) {
+                        Navigator.pop(context); // Pop GardenDetailScreen
+                      }
+                    },
+                  ),
+                );
               }
             },
             items: const [
               AppPopupMenuItemData(value: 'edit', icon: Icons.edit_outlined, label: 'Sửa', color: Colors.blue),
+              AppPopupMenuItemData(value: 'delete', icon: Icons.delete_outline, label: 'Xóa', color: Colors.red, isDestructive: true),
             ],
           ),
         ],
@@ -311,7 +326,7 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
       context: context,
       builder: (_) => ConfirmDeleteDialog(
         title: 'Xác nhận xóa cây',
-        content: 'Bạn có chắc chắn muốn xóa **${plant.name}** không?\nHành động này không thể hoàn tác.',
+        content: 'Bạn có chắc chắn muốn xóa cây ${plant.name} không?\nHành động này không thể hoàn tác.',
         onConfirm: () async => ref.read(plantProvider(widget.garden.id).notifier).deletePlant(plant.id),
       ),
     );

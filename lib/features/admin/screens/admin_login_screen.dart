@@ -5,6 +5,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/storage/secure_storage.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/app_text_field.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../../auth/providers/auth_provider.dart';
 
 class AdminLoginScreen extends ConsumerStatefulWidget {
@@ -46,12 +48,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
         // Tai khoan khong phai Admin - xoa token va bao loi
         await SecureStorage.clear();
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Tài khoản này không có quyền quản trị viên!'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          AppSnackbar.showError(context, 'Tài khoản này không có quyền quản trị viên');
         }
       }
     }
@@ -62,8 +59,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
     final authState = ref.watch(authProvider);
 
     return Scaffold(
-      // Nen toi theo Figma
-      backgroundColor: const Color(0xFF0F172A),
+      backgroundColor: AppColors.background,
       body: Center(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(24),
@@ -73,11 +69,11 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 48),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: AppColors.surface,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                    color: Colors.black.withOpacity(0.3),
+                    color: Colors.black.withOpacity(0.05),
                     blurRadius: 40,
                     offset: const Offset(0, 16),
                   ),
@@ -98,7 +94,7 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                       ),
                       child: const Icon(
                         Icons.shield_outlined,
-                        color: AppColors.primaryLight,
+                        color: AppColors.primary,
                         size: 36,
                       ),
                     ),
@@ -142,6 +138,21 @@ class _AdminLoginScreenState extends ConsumerState<AdminLoginScreen> {
                         if (v == null || v.isEmpty) return 'Vui long nhap mat khau';
                         return null;
                       },
+                    ),
+                    const SizedBox(height: 12),
+                    
+                    // === QUÊN MẬT KHẨU ===
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: GestureDetector(
+                        onTap: () {
+                          context.push('/forgot-password');
+                        },
+                        child: Text(
+                          'Quên mật khẩu?',
+                          style: AppTextStyles.link,
+                        ),
+                      ),
                     ),
                     const SizedBox(height: 28),
 

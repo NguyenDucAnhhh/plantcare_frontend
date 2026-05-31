@@ -8,6 +8,8 @@ import '../widgets/post_form_bottom_sheet.dart';
 import '../../../core/widgets/custom_header.dart';
 import '../../../core/widgets/custom_tab_switcher.dart';
 
+import 'package:go_router/go_router.dart';
+
 class PostScreen extends ConsumerStatefulWidget {
   const PostScreen({super.key});
 
@@ -17,10 +19,13 @@ class PostScreen extends ConsumerStatefulWidget {
 
 class _PostScreenState extends ConsumerState<PostScreen> {
   int _selectedTabIndex = 0; // 0: Tất cả, 1: Đang theo dõi
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey<RefreshIndicatorState> _refreshIndicatorKey = GlobalKey<RefreshIndicatorState>();
 
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(_onScroll);
     // Đợi widget dựng xong thì kiểm tra dữ liệu bài đăng
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final postsState = ref.read(postProvider);
@@ -29,6 +34,18 @@ class _PostScreenState extends ConsumerState<PostScreen> {
         ref.read(postProvider.notifier).loadPosts();
       }
     });
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >= _scrollController.position.maxScrollExtent - 200) {
+      ref.read(postProvider.notifier).loadMorePosts(isFollowing: _selectedTabIndex == 1);
+    }
   }
 
   void _showCreatePostForm() {
@@ -50,6 +67,21 @@ class _PostScreenState extends ConsumerState<PostScreen> {
         title: 'Cộng đồng',
         actions: [
           IconButton(
+            icon: const Icon(Icons.search, color: Colors.white, size: 26),
+            onPressed: () {
+              context.push('/community-search');
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.refresh, color: Colors.white, size: 26),
+            onPressed: () {
+              if (_scrollController.hasClients) {
+                _scrollController.jumpTo(0.0);
+              }
+              _refreshIndicatorKey.currentState?.show();
+            },
+          ),
+          IconButton(
             icon: const Icon(Icons.add, color: Colors.white, size: 28),
             onPressed: _showCreatePostForm,
           ),
@@ -70,7 +102,8 @@ class _PostScreenState extends ConsumerState<PostScreen> {
           // Hiển thị danh sách bài đăng hoặc trạng thái Loading/Error
           Expanded(
             child: RefreshIndicator(
-              onRefresh: () => ref.read(postProvider.notifier).loadPosts(
+              key: _refreshIndicatorKey,
+              onRefresh: () => ref.read(postProvider.notifier).refreshPosts(
                 isFollowing: _selectedTabIndex == 1,
               ),
               child: _buildMainContent(postsState),
@@ -124,9 +157,18 @@ class _PostScreenState extends ConsumerState<PostScreen> {
 
     // 4. Hiển thị danh sách bài đăng
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: state.posts.length,
+      itemCount: state.posts.length + (state.isLoadingMore ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index == state.posts.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16.0),
+            child: Center(
+              child: CircularProgressIndicator(color: AppColors.primary),
+            ),
+          );
+        }
         return PostCard(post: state.posts[index]);
       },
     );

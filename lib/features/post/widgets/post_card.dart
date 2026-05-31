@@ -1,55 +1,58 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../../core/widgets/app_avatar.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import 'post_form_bottom_sheet.dart';
-import 'delete_post_dialog.dart';
+import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../../../core/widgets/app_popup_menu.dart';
 
 class PostCard extends ConsumerWidget {
   final PostModel post;
   final bool isDetailView;
+  final bool isReadOnly;
 
   const PostCard({
     super.key,
     required this.post,
     this.isDetailView = false,
+    this.isReadOnly = false,
   });
 
   Future<void> _handleDeletePost(BuildContext context, WidgetRef ref) async {
-    final confirm = await showDialog<bool>(
+    showDialog(
       context: context,
-      builder: (_) => const DeletePostDialog(),
-    );
-    
-    if (confirm == true) {
-      try {
-        await ref.read(postProvider.notifier).deletePost(post.id);
-        
-        ref.read(postProvider.notifier).loadPosts();
-        ref.read(profileProvider.notifier).loadProfileData();
-        
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Đã xóa bài đăng')),
-          );
-          if (isDetailView) {
-            context.pop();
+      builder: (_) => ConfirmDeleteDialog(
+        title: 'Xác nhận xóa bài đăng',
+        content: 'Bạn có chắc chắn muốn xóa bài đăng này?\nHành động này không thể hoàn tác.',
+        onConfirm: () async {
+          try {
+            await ref.read(postProvider.notifier).deletePost(post.id);
+            
+            ref.read(postProvider.notifier).loadPosts();
+            ref.read(profileProvider.notifier).loadProfileData();
+            
+            if (context.mounted) {
+              AppSnackbar.showSuccess(context, 'Đã xóa bài đăng');
+              if (isDetailView) {
+                context.pop();
+              }
+            }
+          } catch (e) {
+            if (context.mounted) {
+              AppSnackbar.showError(context, ErrorMapper.parseError(e));
+            }
           }
-        }
-      } catch (e) {
-        if (context.mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Lỗi: $e')),
-          );
-        }
-      }
-    }
+        },
+      ),
+    );
   }
 
   @override
@@ -79,7 +82,7 @@ class PostCard extends ConsumerWidget {
               child: Row(
                 children: [
                   GestureDetector(
-                    onTap: () {
+                    onTap: isReadOnly ? null : () {
                       if (post.isMine) {
                         context.go('/profile');
                       } else {
@@ -97,7 +100,7 @@ class PostCard extends ConsumerWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         GestureDetector(
-                          onTap: () {
+                          onTap: isReadOnly ? null : () {
                             if (post.isMine) {
                               context.go('/profile');
                             } else {
@@ -116,7 +119,7 @@ class PostCard extends ConsumerWidget {
                       ],
                     ),
                   ),
-                  if (post.isMine)
+                  if (post.isMine && !isReadOnly)
                     AppPopupMenu(
                       onSelected: (val) {
                         if (val == 'edit') {
@@ -169,10 +172,10 @@ class PostCard extends ConsumerWidget {
                 children: [
                   // Like
                   GestureDetector(
-                    onTap: () {
+                    onTap: isReadOnly ? null : () {
                       ref.read(postProvider.notifier).toggleLike(post.id).catchError((e) {
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
+                          AppSnackbar.showError(context, ErrorMapper.parseError(e));
                         }
                       });
                     },
@@ -244,6 +247,9 @@ class _ImageCarouselState extends State<_ImageCarousel> {
         SizedBox(
           height: 300,
           child: PageView.builder(
+            scrollBehavior: const MaterialScrollBehavior().copyWith(
+              dragDevices: {PointerDeviceKind.mouse, PointerDeviceKind.touch, PointerDeviceKind.trackpad, PointerDeviceKind.stylus},
+            ),
             itemCount: widget.imageUrls.length,
             onPageChanged: (index) {
               setState(() {

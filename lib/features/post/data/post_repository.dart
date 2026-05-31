@@ -15,11 +15,17 @@ class PostRepository {
   PostRepository();
 
   // Lấy danh sách tất cả bài viết trên Newfeed
-  Future<List<PostModel>> getAllVisiblePosts() async {
+  Future<List<PostModel>> getAllVisiblePosts({int page = 0, int size = 5}) async {
     try {
-      final response = await _dio.get('/api/posts');
+      final response = await _dio.get(
+        '/api/posts',
+        queryParameters: {
+          'page': page,
+          'size': size,
+        },
+      );
       if (response.data != null) {
-        final List<dynamic> data = response.data;
+        final List<dynamic> data = response.data; // It's already a list from backend
         return data.map((json) => PostModel.fromJson(json)).toList();
       }
       return [];
@@ -48,18 +54,40 @@ class PostRepository {
   }
 
   // Lấy danh sách bài viết của những người mình đang theo dõi
-  Future<List<PostModel>> getFollowingPosts() async {
+  Future<List<PostModel>> getFollowingPosts({int page = 0, int size = 5}) async {
     try {
-      final response = await _dio.get('/api/posts/following');
+      final response = await _dio.get('/api/posts/following', queryParameters: {
+        'page': page,
+        'size': size,
+      });
+      final List<dynamic> data = response.data;
+      return data.map((json) => PostModel.fromJson(json)).toList();
+    } catch (e) {
+      throw Exception('Lỗi khi lấy bài viết đang theo dõi: $e');
+    }
+  }
+
+  // Tìm kiếm bài viết
+  Future<List<PostModel>> searchPosts(String keyword, {int page = 0, int size = 20}) async {
+    try {
+      final response = await _dio.get(
+        '/api/posts/search',
+        queryParameters: {
+          'keyword': keyword,
+          'page': page,
+          'size': size,
+        },
+      );
       if (response.data != null) {
         final List<dynamic> data = response.data;
         return data.map((json) => PostModel.fromJson(json)).toList();
       }
       return [];
     } catch (e) {
-      throw Exception('Lỗi khi lấy danh sách bài viết đang theo dõi: $e');
+      throw Exception('Lỗi khi tìm kiếm bài viết: $e');
     }
   }
+
 
   // Upload nhiều ảnh
   Future<List<String>> uploadPostImages(List<File> files) async {

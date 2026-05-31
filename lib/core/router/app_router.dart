@@ -17,8 +17,19 @@ import '../../features/diagnosis/screens/diagnosis_history_screen.dart';
 import '../../features/garden/screens/garden_screen.dart';
 import '../../features/post/screens/post_screen.dart';
 import '../../features/post/screens/post_detail_screen.dart';
+import '../../features/post/screens/community_search_screen.dart';
 import '../../features/profile/screens/public_profile_screen.dart';
 import '../../features/notification/screens/notification_screen.dart';
+import '../../features/admin/screens/admin_tips_screen.dart';
+import '../../features/admin/screens/admin_tip_editor_screen.dart';
+import '../../features/admin/screens/admin_users_screen.dart';
+import '../../features/admin/screens/admin_posts_screen.dart';
+import '../../features/admin/screens/admin_reports_screen.dart';
+import '../../features/admin/screens/admin_diagnoses_screen.dart';
+import '../../features/admin/widgets/admin_layout_shell.dart';
+import '../../features/tips/screens/tips_screen.dart';
+import '../../features/tips/screens/tip_detail_screen.dart';
+import '../../features/tips/data/care_tip_model.dart';
 import '../widgets/scaffold_with_nav_bar.dart';
 import '../../core/storage/secure_storage.dart';
 
@@ -130,14 +141,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
                 name: 'posts',
                 builder: (context, state) => const PostScreen(),
               ),
-              // GoRoute(
-              //   path: '/user/:id',
-              //   name: 'public_profile',
-              //   builder: (context, state) {
-              //     final id = state.pathParameters['id']!;
-              //     return PublicProfileScreen(userId: id);
-              //   },
-              // ),
+              GoRoute(
+                path: '/posts/:id',
+                builder: (context, state) => PostDetailScreen(
+                  postId: state.pathParameters['id']!,
+                ),
+              ),
+              GoRoute(
+                path: '/community-search',
+                builder: (context, state) => const CommunitySearchScreen(),
+              ),
             ],
           ),
 
@@ -195,10 +208,67 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         name: 'admin-login',
         builder: (context, state) => const AdminLoginScreen(),
       ),
+      StatefulShellRoute.indexedStack(
+        builder: (context, state, navigationShell) {
+          return AdminLayoutShell(navigationShell: navigationShell);
+        },
+        branches: [
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/dashboard',
+                builder: (context, state) => const AdminDashboardScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/users',
+                builder: (context, state) => const AdminUsersScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/posts',
+                builder: (context, state) => const AdminPostsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/reports',
+                builder: (context, state) => const AdminReportsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/tips',
+                builder: (context, state) => const AdminTipsScreen(),
+              ),
+            ],
+          ),
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: '/admin/diagnoses',
+                builder: (context, state) => const AdminDiagnosesScreen(),
+              ),
+            ],
+          ),
+        ],
+      ),
       GoRoute(
-        path: '/admin/dashboard',
-        name: 'admin-dashboard',
-        builder: (context, state) => const AdminDashboardScreen(),
+        path: '/admin/tips/edit',
+        builder: (context, state) {
+          final tip = state.extra as CareTipModel?;
+          return AdminTipEditorScreen(initialTip: tip);
+        },
       ),
 
       // === SETTINGS ===
@@ -213,39 +283,20 @@ final appRouterProvider = Provider<GoRouter>((ref) {
         builder: (context, state) => const ChangePasswordScreen(),
       ),
 
-      // TIPS (Chua phan nhanh hoac la man hinh doc lap)
+      // === TIPS ===
       GoRoute(
         path: '/tips',
         name: 'tips',
-        builder: (context, state) => const _ComingSoon(title: 'Meo hay'),
+        builder: (context, state) => const TipsScreen(),
+      ),
+      GoRoute(
+        path: '/tips/detail',
+        name: 'tip_detail',
+        builder: (context, state) {
+          final tip = state.extra as CareTipModel;
+          return TipDetailScreen(tip: tip);
+        },
       ),
     ],
   );
 });
-
-class _ComingSoon extends StatelessWidget {
-  final String title;
-  const _ComingSoon({required this.title});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: Text(title)),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            const Icon(Icons.construction_rounded, size: 64, color: Colors.grey),
-            const SizedBox(height: 16),
-            Text('$title\nDang phat trien...', textAlign: TextAlign.center),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: () => context.go('/home'),
-              child: const Text('Quay ve Trang chu'),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-}

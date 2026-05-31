@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../providers/auth_provider.dart';
 
 class ResetPasswordScreen extends ConsumerStatefulWidget {
@@ -40,13 +41,8 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         );
 
     if (success && mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      // Chuyển về màn hình đăng nhập
+      AppSnackbar.showSuccess(context, 'Đặt lại mật khẩu thành công! Vui lòng đăng nhập lại.');
+      // Chuyen ve man hinh dang nhap
       context.go('/login');
     }
   }
@@ -69,8 +65,10 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Container(
-              padding: const EdgeInsets.all(28),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Container(
+                padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(24),
@@ -156,6 +154,7 @@ class _ResetPasswordScreenState extends ConsumerState<ResetPasswordScreen> {
                     ),
                   ],
                 ),
+              ),
               ),
             ),
           ),

@@ -5,6 +5,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/app_button.dart';
 import '../../../core/widgets/app_text_field.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../../core/widgets/custom_header.dart';
 import '../providers/profile_provider.dart';
 
@@ -38,30 +40,23 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
     final oldPassword = _oldPasswordCtrl.text.trim();
     final newPassword = _newPasswordCtrl.text.trim();
     
-    final success = await ref.read(profileProvider.notifier).changePassword(
-          oldPassword,
-          newPassword,
-        );
+    try {
+      final success = await ref.read(profileProvider.notifier).changePassword(
+            oldPassword,
+            newPassword,
+          );
 
-    setState(() => _isLoading = false);
-
-    if (mounted) {
-      if (success) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Đổi mật khẩu thành công!'),
-            backgroundColor: Colors.green,
-          ),
-        );
-        // Chuyển về màn hình cài đặt
-        context.pop();
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Mật khẩu cũ không chính xác hoặc có lỗi xảy ra!'),
-            backgroundColor: Colors.red,
-          ),
-        );
+      if (mounted) {
+        setState(() => _isLoading = false);
+        if (success) {
+          AppSnackbar.showSuccess(context, 'Đổi mật khẩu thành công!');
+          context.pop();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoading = false);
+        AppSnackbar.showError(context, ErrorMapper.parseError(e));
       }
     }
   }
@@ -78,8 +73,10 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
         child: Center(
           child: SingleChildScrollView(
             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-            child: Container(
-              padding: const EdgeInsets.all(28),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 500),
+              child: Container(
+                padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
                 color: AppColors.surface,
                 borderRadius: BorderRadius.circular(24),
@@ -161,6 +158,7 @@ class _ChangePasswordScreenState extends ConsumerState<ChangePasswordScreen> {
                     ),
                   ],
                 ),
+              ),
               ),
             ),
           ),

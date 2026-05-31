@@ -4,13 +4,18 @@ import 'core/constants/app_colors.dart';
 import 'core/router/app_router.dart';
 
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_quill/flutter_quill.dart';
+import 'firebase_options.dart';
 import 'core/services/notification_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Khởi tạo Firebase
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   
   // Khởi tạo dịch vụ thông báo
   final notificationService = NotificationService();
@@ -38,6 +43,17 @@ class PlantCareApp extends ConsumerWidget {
 
       // Cai dat bo nhan dien duong dan tu GoRouter
       routerConfig: router,
+      
+      localizationsDelegates: const [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+        FlutterQuillLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('vi', 'VN'),
+        Locale('en', 'US'),
+      ],
 
       // Theme chung cho toan app
       theme: ThemeData(

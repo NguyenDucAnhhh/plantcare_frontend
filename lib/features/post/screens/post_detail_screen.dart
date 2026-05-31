@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../../core/widgets/app_avatar.dart';
 import '../../auth/providers/auth_provider.dart';
 import '../../profile/providers/profile_provider.dart';
@@ -71,6 +73,55 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           showBackButton: true,
         ),
         body: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      );
+    }
+
+    if (!postsState.isLoading && post.authorId.isEmpty) {
+      return Scaffold(
+        backgroundColor: AppColors.background,
+        appBar: const CustomHeader(
+          title: 'Chi tiết bài đăng',
+          showBackButton: true,
+        ),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const Icon(Icons.sentiment_dissatisfied_rounded, size: 80, color: Colors.grey),
+                const SizedBox(height: 16),
+                Text(
+                  'Bài đăng này đã bị xóa hoặc bị ẩn',
+                  style: AppTextStyles.heading2.copyWith(color: AppColors.textDark),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Bạn không thể xem nội dung của bài đăng này nữa.',
+                  style: AppTextStyles.bodyGrey,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: () {
+                    if (context.canPop()) {
+                      context.pop();
+                    } else {
+                      context.go('/');
+                    }
+                  },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                  ),
+                  child: const Text('Quay lại', style: TextStyle(color: Colors.white, fontSize: 16)),
+                ),
+              ],
+            ),
+          ),
+        ),
       );
     }
 
@@ -329,9 +380,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                   await ref.read(commentProvider(widget.postId).notifier).addComment(content, parentId: _replyingTo?.id);
                   setState(() { _replyingTo = null; });
                 } catch (e) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('Lỗi: $e')),
-                  );
+                  if (context.mounted) {
+                    AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                  }
                 }
               }
             },

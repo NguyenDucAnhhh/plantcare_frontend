@@ -3,13 +3,15 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../core/widgets/app_avatar.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/profile_header.dart';
+import '../widgets/profile_form_bottom_sheet.dart';
+import '../../../core/utils/error_mapper.dart';
+import '../../../core/utils/app_snackbar.dart';
 
 class ProfileScreen extends ConsumerStatefulWidget {
   const ProfileScreen({super.key});
@@ -40,247 +42,23 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     super.dispose();
   }
 
-  void _showQrDialog(Map<String, dynamic> profile) {
-    final userId = profile['id'] ?? 0;
-
-    showDialog(
+  void _showEditProfileBottomSheet() {
+    showModalBottomSheet(
       context: context,
-      builder: (context) {
-        return Dialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          backgroundColor: Colors.white,
-          child: Padding(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    const SizedBox(width: 24), // can bang de center tieu de
-                    Text(
-                      'Mã QR hồ sơ của bạn',
-                      style: AppTextStyles.heading3,
-                    ),
-                    InkWell(
-                      onTap: () => Navigator.pop(context),
-                      child: const Icon(
-                          Icons.close, color: AppColors.textGrey, size: 24),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 32),
-                QrImageView(
-                  data: "https://plantcare.app/user/$userId",
-                  version: QrVersions.auto,
-                  size: 200.0,
-                ),
-                const SizedBox(height: 32),
-                Text(
-                  'Quét mã này để xem hồ sơ của bạn',
-                  style: AppTextStyles.bodyGrey.copyWith(fontSize: 13),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  void _showEditProfileDialog(Map<String, dynamic> profile) {
-    final nameCtrl = TextEditingController(text: profile['fullName'] ?? '');
-    final bioCtrl = TextEditingController(
-        text: profile['bio'] ?? 'Chưa có thông tin giới thiệu.');
-
-    showDialog(
-      context: context,
-      builder: (context) {
-        return StatefulBuilder(
-            builder: (context, setStateDialog) {
-              return Dialog(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                backgroundColor: Colors.white,
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: const EdgeInsets.all(24.0),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            const SizedBox(width: 24),
-                            Text(
-                              'Chỉnh sửa hồ sơ',
-                              style: AppTextStyles.heading3,
-                            ),
-                            InkWell(
-                              onTap: () => Navigator.pop(context),
-                              child: const Icon(
-                                  Icons.close, color: AppColors.textGrey,
-                                  size: 24),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Avatar
-                        Text('Ảnh đại diện', style: AppTextStyles.body.copyWith(
-                            fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 12),
-                        Row(
-                          children: [
-                            AppAvatar(
-                              imageUrl: profile['avatarUrl'],
-                              // Truyền link ảnh từ server (nếu có)
-                              localPath: localAvatarPath,
-                              // Truyền đường dẫn ảnh vừa chọn ở máy (nếu có)
-                              radius: 40, // Kích thước to cho màn hình chỉnh sửa
-                            ),
-                            const SizedBox(width: 16),
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                OutlinedButton.icon(
-                                  onPressed: () async {
-                                    final ImagePicker picker = ImagePicker();
-                                    final XFile? image = await picker.pickImage(
-                                        source: ImageSource.gallery);
-                                    if (image != null) {
-                                      setStateDialog(() {
-                                        localAvatarPath = image.path;
-                                      });
-                                    }
-                                  },
-                                  icon: const Icon(
-                                      Icons.camera_alt_outlined, size: 18,
-                                      color: AppColors.textDark),
-                                  label: const Text('Chọn ảnh',
-                                      style: TextStyle(
-                                          color: AppColors.textDark)),
-                                  style: OutlinedButton.styleFrom(
-                                    side: BorderSide(
-                                        color: Colors.grey.shade300),
-                                    shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8)),
-                                  ),
-                                ),
-                                const SizedBox(height: 4),
-                                Text('Tối đa 5MB',
-                                    style: AppTextStyles.bodyGrey.copyWith(
-                                        fontSize: 12)),
-                              ],
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Ten hien thi
-                        Text('Tên hiển thị', style: AppTextStyles.body.copyWith(
-                            fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: nameCtrl,
-                          decoration: InputDecoration(
-                            filled: true,
-                            fillColor: AppColors.inputBg,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-
-                        // Gioi thieu
-                        Text('Giới thiệu', style: AppTextStyles.body.copyWith(
-                            fontWeight: FontWeight.w600)),
-                        const SizedBox(height: 8),
-                        TextField(
-                          controller: bioCtrl,
-                          maxLines: 3,
-                          decoration: InputDecoration(
-                            hintText: 'Viết vài dòng về bạn...',
-                            filled: true,
-                            fillColor: AppColors.inputBg,
-                            border: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(10),
-                              borderSide: BorderSide.none,
-                            ),
-                            contentPadding: const EdgeInsets.symmetric(
-                                horizontal: 16, vertical: 12),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-
-                        // Nut luu
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              try {
-                                final repo = ref.read(
-                                    profileRepositoryProvider);
-
-                                // Upload anh truoc neu co thay doi
-                                if (localAvatarPath != null && !kIsWeb) {
-                                  await repo.uploadAvatar(localAvatarPath!);
-                                }
-
-                                // Sau do cap nhat thong tin khac
-                                await repo.updateProfile({
-                                  'fullName': nameCtrl.text,
-                                  'bio': bioCtrl.text,
-                                });
-
-                                if (context.mounted) {
-                                  Navigator.pop(context);
-                                  ref
-                                      .read(profileProvider.notifier)
-                                      .loadProfileData(); // Reload
-                                }
-                              } catch (e) {
-                                if (context.mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text('Lỗi cập nhật: $e')),
-                                  );
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.buttonDark,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Text('Lưu thay đổi', style: TextStyle(
-                                color: Colors.white, fontSize: 16)),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              );
-            }
-        );
-      },
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) => const ProfileFormBottomSheet(),
     );
   }
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(profileProvider, (previous, next) {
+      if (next.error != null && next.error!.isNotEmpty && (previous?.error != next.error)) {
+        AppSnackbar.showError(context, ErrorMapper.parseError(next.error));
+      }
+    });
+
     final profileState = ref.watch(profileProvider);
 
     if (profileState.isLoading && profileState.profile == null) {
@@ -320,19 +98,9 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
               children: [
                 Expanded(
                   child: ElevatedButton.icon(
-                    onPressed: () => _showEditProfileDialog(profile),
+                    onPressed: _showEditProfileBottomSheet,
                     icon: const Icon(Icons.edit_outlined, size: 18),
                     label: const Text('Chỉnh sửa'),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white),
-                  ),
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: () => _showQrDialog(profile),
-                    icon: const Icon(Icons.qr_code, size: 18),
-                    label: const Text('Mã QR'),
                     style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.white),
                   ),
@@ -403,7 +171,18 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
             color: Colors.grey.shade200,
             child: firstImage != null
                 ? Image.network(firstImage, fit: BoxFit.cover)
-                : const Center(child: Icon(Icons.image, color: Colors.grey)),
+                : Container(
+                    padding: const EdgeInsets.all(8.0),
+                    alignment: Alignment.center,
+                    color: Colors.white,
+                    child: Text(
+                      post['content'] ?? '',
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(fontSize: 12, color: Colors.black87),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
           ),
         );
       },

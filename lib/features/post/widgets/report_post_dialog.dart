@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../providers/post_provider.dart';
 
 class ReportPostDialog extends ConsumerStatefulWidget {
@@ -84,15 +86,11 @@ class _ReportPostDialogState extends ConsumerState<ReportPostDialog> {
                         await ref.read(postProvider.notifier).reportPost(widget.postId, _reasonCtrl.text);
                         if (context.mounted) {
                           Navigator.pop(context);
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(content: Text('Đã gửi báo cáo thành công')),
-                          );
+                          AppSnackbar.showSuccess(context, 'Đã gửi báo cáo thành công');
                         }
                       } catch (e) {
                         if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(content: Text('Lỗi: $e')),
-                          );
+                          AppSnackbar.showError(context, ErrorMapper.parseError(e));
                         }
                       }
                     },

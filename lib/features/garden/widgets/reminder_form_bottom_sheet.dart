@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/widgets/custom_bottom_sheet_form.dart';
 import '../../../core/widgets/app_button.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../models/reminder_model.dart';
 import '../providers/plant_provider.dart';
 import '../providers/reminder_provider.dart';
@@ -203,17 +205,13 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
 
   Future<void> _submit() async {
     if (_selectedPlantId == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng chọn cây')),
-      );
+      AppSnackbar.showError(context, 'Vui lòng chọn cây');
       return;
     }
 
     final count = _repeatCountCtrl.text.trim();
     if (count.isEmpty || int.tryParse(count) == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Vui lòng nhập số lặp lại hợp lệ')),
-      );
+      AppSnackbar.showError(context, 'Vui lòng nhập số lặp lại hợp lệ');
       return;
     }
 
@@ -255,56 +253,15 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
 
     String formattedTime = _selectedTime.format(context);
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        top: 16,
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
+    return CustomBottomSheetForm(
+      title: isEdit ? 'Cập nhật lịch chăm sóc' : 'Thêm lịch chăm sóc',
+      actionLabel: isEdit ? 'Lưu thay đổi' : 'Thêm lịch',
+      onActionPressed: _submit,
+      isActionLoading: reminderState.isLoading,
+      content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Drag Handle
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                margin: const EdgeInsets.only(bottom: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-            ),
-
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    isEdit ? 'Cập nhật lịch chăm sóc' : 'Thêm lịch chăm sóc',
-                    style: AppTextStyles.heading2,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
             // Chon cay
             _buildLabel('Chọn cây'),
             _buildDropdownContainer(
@@ -499,16 +456,8 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
                 padding: const EdgeInsets.only(bottom: 12),
                 child: Text(reminderState.error!, style: TextStyle(color: AppColors.error)),
               ),
-
-            // Button submit
-            AppButton(
-              label: isEdit ? 'Lưu thay đổi' : 'Thêm lịch',
-              isLoading: reminderState.isLoading,
-              onPressed: _submit,
-            ),
           ],
         ),
-      ),
     );
   }
 

@@ -4,7 +4,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/custom_bottom_sheet_form.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../models/post_model.dart';
 import '../providers/post_provider.dart';
 import '../../profile/providers/profile_provider.dart';
@@ -43,9 +45,7 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
   Future<void> _pickImages() async {
     if (_selectedImages.length + _existingImageUrls.length >= 4) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Chỉ được chọn tối đa 4 ảnh')),
-        );
+        AppSnackbar.showError(context, 'Chỉ được chọn tối đa 4 ảnh');
       }
       return;
     }
@@ -80,62 +80,56 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
     });
   }
 
+  Future<void> _submit() async {
+    if (_contentController.text.trim().isEmpty) return;
+    setState(() => _isLoading = true);
+    
+    try {
+      final isEdit = widget.post != null;
+      if (isEdit) {
+        await ref.read(postProvider.notifier).updatePost(
+          widget.post!.id, 
+          _contentController.text,
+          newImages: _selectedImages,
+          existingImageUrls: _existingImageUrls,
+        );
+      } else {
+        await ref.read(postProvider.notifier).createPost(
+          _contentController.text,
+          images: _selectedImages,
+        );
+        ref.read(postProvider.notifier).loadPosts();
+      }
+
+      // Refresh profile
+      ref.read(profileProvider.notifier).loadProfileData();
+
+      if (mounted) {
+        AppSnackbar.showSuccess(context, isEdit ? 'Cập nhật thành công' : 'Đăng bài thành công');
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+      }
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isEdit = widget.post != null;
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        top: 16,
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Drag Handle (Optional, but good for UX)
-            if (!isEdit)
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    isEdit ? 'Chỉnh sửa bài đăng' : 'Tạo bài đăng',
-                    style: AppTextStyles.heading2,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.close),
-                  onPressed: () => Navigator.pop(context),
-                  padding: EdgeInsets.zero,
-                  constraints: const BoxConstraints(),
-                ),
-              ],
-            ),
-            const SizedBox(height: 24),
-
-            // Text Area
+    return CustomBottomSheetForm(
+      title: isEdit ? 'Chỉnh sửa bài đăng' : 'Tạo bài đăng',
+      actionLabel: isEdit ? 'Lưu bài đăng' : 'Đăng bài',
+      onActionPressed: _submit,
+      isActionLoading: _isLoading,
+      content: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Text Area
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
@@ -282,90 +276,7 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
                 ),
               ),
 
-            if (!isEdit) const SizedBox(height: 24),
-
-            // Buttons
-            if (isEdit)
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        side: const BorderSide(color: AppColors.textLight),
-                      ),
-                      child: Text('Hủy', style: AppTextStyles.button.copyWith(color: AppColors.textDark)),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: AppButton(
-                      label: 'Lưu',
-                      isLoading: _isLoading,
-                      onPressed: () async {
-                        if (_contentController.text.trim().isEmpty) return;
-                        setState(() => _isLoading = true);
-                        try {
-                          await ref.read(postProvider.notifier).updatePost(
-                            widget.post!.id, 
-                            _contentController.text,
-                            newImages: _selectedImages,
-                            existingImageUrls: _existingImageUrls,
-                          );
-
-                          // Refresh profile
-                          ref.read(profileProvider.notifier).loadProfileData();
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Cập nhật thành công')));
-                            Navigator.pop(context);
-                          }
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
-                          }
-                        } finally {
-                          if (mounted) setState(() => _isLoading = false);
-                        }
-                      },
-                    ),
-                  ),
-                ],
-              )
-            else
-              AppButton(
-                label: 'Đăng bài',
-                isLoading: _isLoading,
-                onPressed: () async {
-                  if (_contentController.text.trim().isEmpty) return;
-                  setState(() => _isLoading = true);
-                  try {
-                    await ref.read(postProvider.notifier).createPost(
-                      _contentController.text,
-                      images: _selectedImages,
-                    );
-
-                    // Refresh danh sách bài đăng và profile
-                    ref.read(postProvider.notifier).loadPosts();
-                    ref.read(profileProvider.notifier).loadProfileData();
-
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Đăng bài thành công')));
-                      Navigator.pop(context);
-                    }
-                  } catch (e) {
-                    if (context.mounted) {
-                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Lỗi: $e')));
-                    }
-                  } finally {
-                    if (mounted) setState(() => _isLoading = false);
-                  }
-                },
-              ),
-          ],
-        ),
+        ],
       ),
     );
   }

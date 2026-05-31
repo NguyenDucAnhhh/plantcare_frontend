@@ -7,23 +7,35 @@ import '../data/post_repository.dart';
 class PostState {
   final List<PostModel> posts;
   final bool isLoading;
+  final bool isLoadingMore;
   final String? error;
+  final int page;
+  final bool hasMore;
 
   PostState({
     this.posts = const [],
     this.isLoading = false,
+    this.isLoadingMore = false,
     this.error,
+    this.page = 0,
+    this.hasMore = true,
   });
 
   PostState copyWith({
     List<PostModel>? posts,
     bool? isLoading,
+    bool? isLoadingMore,
     String? error,
+    int? page,
+    bool? hasMore,
   }) {
     return PostState(
       posts: posts ?? this.posts,
       isLoading: isLoading ?? this.isLoading,
+      isLoadingMore: isLoadingMore ?? this.isLoadingMore,
       error: error,
+      page: page ?? this.page,
+      hasMore: hasMore ?? this.hasMore,
     );
   }
 }
@@ -62,15 +74,44 @@ class PostNotifier extends StateNotifier<PostState> {
   }
 
   Future<void> loadPosts({bool isFollowing = false}) async {
-    state = state.copyWith(isLoading: true, error: null);
+    state = state.copyWith(isLoading: true, error: null, page: 0, hasMore: true);
     try {
       final posts = isFollowing
-          ? await _repository.getFollowingPosts()
-          : await _repository.getAllVisiblePosts();
-      state = state.copyWith(isLoading: false, posts: posts);
+          ? await _repository.getFollowingPosts(page: 0, size: 5)
+          : await _repository.getAllVisiblePosts(page: 0, size: 5);
+      state = state.copyWith(
+        isLoading: false, 
+        posts: posts, 
+        hasMore: posts.length >= 5
+      );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
     }
+  }
+
+  Future<void> loadMorePosts({bool isFollowing = false}) async {
+    if (state.isLoadingMore || !state.hasMore || state.isLoading) return;
+
+    state = state.copyWith(isLoadingMore: true);
+    try {
+      final nextPage = state.page + 1;
+      final newPosts = isFollowing
+          ? await _repository.getFollowingPosts(page: nextPage, size: 5)
+          : await _repository.getAllVisiblePosts(page: nextPage, size: 5);
+      
+      state = state.copyWith(
+        isLoadingMore: false,
+        posts: [...state.posts, ...newPosts],
+        page: nextPage,
+        hasMore: newPosts.length >= 5,
+      );
+    } catch (e) {
+      state = state.copyWith(isLoadingMore: false, error: e.toString());
+    }
+  }
+
+  Future<void> refreshPosts({bool isFollowing = false}) async {
+    await loadPosts(isFollowing: isFollowing);
   }
 
   Future<void> createPost(String content, {List<dart_io.File> images = const []}) async {

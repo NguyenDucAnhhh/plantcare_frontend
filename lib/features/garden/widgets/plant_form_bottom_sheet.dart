@@ -6,7 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/widgets/app_button.dart';
+import '../../../core/widgets/custom_bottom_sheet_form.dart';
 import '../models/plant_model.dart';
 import '../providers/plant_provider.dart';
 
@@ -124,116 +124,67 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
     final isEdit = widget.plant != null;
     final plantState = ref.watch(plantProvider(widget.gardenId));
 
-    return Container(
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
-      ),
-      padding: EdgeInsets.only(
-        top: 16,
-        left: 24,
-        right: 24,
-        bottom: MediaQuery.of(context).viewInsets.bottom + 24,
-      ),
-      child: Form(
+    return CustomBottomSheetForm(
+      title: isEdit ? 'Chỉnh sửa cây' : 'Thêm cây mới',
+      actionLabel: isEdit ? 'Lưu thay đổi' : 'Thêm cây',
+      onActionPressed: _submit,
+      isActionLoading: plantState.isLoading,
+      content: Form(
         key: _formKey,
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Drag Handle
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: Colors.grey.shade300,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Anh cay
+            _buildLabel('Ảnh cây'),
+            const SizedBox(height: 4),
+            GestureDetector(
+              onTap: _pickImage,
+              child: _buildImagePicker(isEdit),
+            ),
+
+            // Ten cay
+            _buildLabel('Tên cây *'),
+            _buildTextField(
+              controller: _nameCtrl,
+              hint: 'VD: Cà chua cherry',
+              validator: (v) => v!.isEmpty ? 'Vui lòng nhập tên cây' : null,
+            ),
+
+            // Loai cay
+            _buildLabel('Loại cây'),
+            _buildTextField(
+              controller: _speciesCtrl,
+              hint: 'VD: Cà chua',
+            ),
+
+            // Ngay trong
+            _buildLabel('Ngày trồng'),
+            GestureDetector(
+              onTap: _pickDate,
+              child: AbsorbPointer(
+                child: _buildTextField(
+                  controller: _dateCtrl,
+                  hint: '',
+                  suffixIcon: const Icon(Icons.calendar_today_outlined, size: 18, color: Colors.grey),
                 ),
               ),
+            ),
 
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Expanded(
-                    child: Text(
-                      isEdit ? 'Chỉnh sửa cây' : 'Thêm cây mới',
-                      style: AppTextStyles.heading2,
-                      textAlign: TextAlign.center,
-                    ),
-                  ),
-                  IconButton(
-                    icon: const Icon(Icons.close),
-                    onPressed: () => Navigator.pop(context),
-                    padding: EdgeInsets.zero,
-                    constraints: const BoxConstraints(),
-                  ),
-                ],
+            // Mo ta
+            _buildLabel('Mô tả'),
+            _buildTextField(
+              controller: _descCtrl,
+              hint: 'Mô tả về cây của bạn...',
+              maxLines: 3,
+            ),
+            const SizedBox(height: 24),
+
+            if (plantState.error != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: Text(plantState.error!, style: TextStyle(color: AppColors.error)),
               ),
-              const SizedBox(height: 24),
-
-              // Anh cay
-              _buildLabel('Ảnh cây'),
-              const SizedBox(height: 4),
-              GestureDetector(
-                onTap: _pickImage,
-                child: _buildImagePicker(isEdit),
-              ),
-
-              // Ten cay
-              _buildLabel('Tên cây *'),
-              _buildTextField(
-                controller: _nameCtrl,
-                hint: 'VD: Cà chua cherry',
-                validator: (v) => v!.isEmpty ? 'Vui lòng nhập tên cây' : null,
-              ),
-
-              // Loai cay
-              _buildLabel('Loại cây'),
-              _buildTextField(
-                controller: _speciesCtrl,
-                hint: 'VD: Cà chua',
-              ),
-
-              // Ngay trong
-              _buildLabel('Ngày trồng'),
-              GestureDetector(
-                onTap: _pickDate,
-                child: AbsorbPointer(
-                  child: _buildTextField(
-                    controller: _dateCtrl,
-                    hint: '',
-                    suffixIcon: const Icon(Icons.calendar_today_outlined, size: 18, color: Colors.grey),
-                  ),
-                ),
-              ),
-
-              // Mo ta
-              _buildLabel('Mô tả'),
-              _buildTextField(
-                controller: _descCtrl,
-                hint: 'Mô tả về cây của bạn...',
-                maxLines: 3,
-              ),
-              const SizedBox(height: 24),
-
-              if (plantState.error != null)
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 12),
-                  child: Text(plantState.error!, style: TextStyle(color: AppColors.error)),
-                ),
-
-              AppButton(
-                label: isEdit ? 'Lưu thay đổi' : 'Thêm cây',
-                isLoading: plantState.isLoading,
-                onPressed: _submit,
-              ),
-            ],
-          ),
+          ],
         ),
       ),
     );
