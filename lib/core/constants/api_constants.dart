@@ -10,11 +10,11 @@ class ApiConstants {
   //
   // De test tren dien thoai that, chay:
   //   flutter run --dart-define=PHONE_IP=192.168.x.x
-  static const String _phoneIp = String.fromEnvironment('PHONE_IP', defaultValue: '192.168.0.193');
+  // static const String _phoneIp = String.fromEnvironment('PHONE_IP', defaultValue: '192.168.0.193');
 
   static String get baseUrl {
-    if (kIsWeb) return 'http://localhost:8080';
-    return 'http://$_phoneIp:8080';
+    // Đã trỏ thẳng lên máy chủ thật!
+    return 'https://plantcare-backend-g2bj.onrender.com';
   }
 
   // === AUTH ===

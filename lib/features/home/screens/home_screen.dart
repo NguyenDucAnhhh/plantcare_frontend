@@ -20,8 +20,17 @@ class HomeScreen extends ConsumerWidget {
       backgroundColor: AppColors.background,
 
       // === BODY ===
-      body: CustomScrollView(
-        slivers: [
+      body: RefreshIndicator(
+        color: AppColors.primary,
+        onRefresh: () async {
+          // Tải lại dữ liệu thời tiết
+          ref.refresh(weatherProvider);
+          // Đợi 1 chút để UI có cảm giác đang tải
+          await Future.delayed(const Duration(milliseconds: 500));
+        },
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
           // === PHAN HEADER XANH + WEATHER (Figma) ===
           SliverToBoxAdapter(
             child: _buildHeader(context, ref, weatherAsync),
@@ -40,7 +49,7 @@ class HomeScreen extends ConsumerWidget {
           ),
         ],
       ),
-
+      )
     );
   }
 

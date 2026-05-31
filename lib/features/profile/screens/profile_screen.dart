@@ -3,10 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import 'package:image_picker/image_picker.dart';
-import 'dart:io';
-import 'package:flutter/foundation.dart' show kIsWeb;
-import '../../../core/widgets/app_avatar.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_form_bottom_sheet.dart';
@@ -55,7 +51,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
   Widget build(BuildContext context) {
     ref.listen(profileProvider, (previous, next) {
       if (next.error != null && next.error!.isNotEmpty && (previous?.error != next.error)) {
-        AppSnackbar.showError(context, ErrorMapper.parseError(next.error));
+        AppSnackbar.showError(context, ErrorMapper.parseError(next.error!));
       }
     });
 
