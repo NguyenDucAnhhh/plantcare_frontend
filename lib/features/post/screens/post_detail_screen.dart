@@ -54,7 +54,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
   Widget build(BuildContext context) {
     final postsState = ref.watch(postProvider);
     final profileState = ref.watch(profileProvider);
-    
+
     final myAvatarUrl = profileState.profile?['avatarUrl'];
 
     // 2. Tìm bài viết cụ thể trong danh sách posts của state mới
@@ -77,7 +77,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           title: 'Chi tiết bài đăng',
           showBackButton: true,
         ),
-        body: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+        body: const Center(
+          child: CircularProgressIndicator(color: AppColors.primary),
+        ),
       );
     }
 
@@ -94,11 +96,17 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                const Icon(Icons.sentiment_dissatisfied_rounded, size: 80, color: Colors.grey),
+                const Icon(
+                  Icons.sentiment_dissatisfied_rounded,
+                  size: 80,
+                  color: Colors.grey,
+                ),
                 const SizedBox(height: 16),
                 Text(
                   'Bài đăng này đã bị xóa hoặc bị ẩn',
-                  style: AppTextStyles.heading2.copyWith(color: AppColors.textDark),
+                  style: AppTextStyles.heading2.copyWith(
+                    color: AppColors.textDark,
+                  ),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 8),
@@ -118,10 +126,18 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                   },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                    padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 32,
+                      vertical: 12,
+                    ),
                   ),
-                  child: const Text('Quay lại', style: TextStyle(color: Colors.white, fontSize: 16)),
+                  child: const Text(
+                    'Quay lại',
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
                 ),
               ],
             ),
@@ -159,51 +175,79 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Bai dang
-                  if (post != null) PostCard(post: post, isDetailView: true),
-                  
-                  Divider(color: Colors.grey.shade200, thickness: 8, height: 8),
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Bai dang
+                    if (post != null) PostCard(post: post, isDetailView: true),
 
-                  // Binh luan Header
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      'Bình luận (${commentsAsync.value?.length ?? 0})',
-                      style: AppTextStyles.heading2.copyWith(fontSize: 18),
+                    Divider(
+                      color: Colors.grey.shade200,
+                      thickness: 8,
+                      height: 8,
                     ),
-                  ),
 
-                  // Danh sach binh luan
-                  commentsAsync.when(
-                    data: (comments) {
-                      if (comments.isEmpty) {
-                        return Padding(
-                          padding: const EdgeInsets.all(16),
-                          child: Text('Chưa có bình luận nào.', style: AppTextStyles.bodyGrey),
+                    // Binh luan Header
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(
+                        'Bình luận (${commentsAsync.value?.length ?? 0})',
+                        style: AppTextStyles.heading2.copyWith(fontSize: 18),
+                      ),
+                    ),
+
+                    // Danh sach binh luan
+                    commentsAsync.when(
+                      data: (comments) {
+                        if (comments.isEmpty) {
+                          return Padding(
+                            padding: const EdgeInsets.all(16),
+                            child: Text(
+                              'Chưa có bình luận nào.',
+                              style: AppTextStyles.bodyGrey,
+                            ),
+                          );
+                        }
+                        final topLevelComments = comments
+                            .where((c) => c.parentCommentId == null)
+                            .toList();
+                        return ListView.separated(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: topLevelComments.length,
+                          separatorBuilder: (_, __) =>
+                              Divider(color: Colors.grey.shade200, height: 1),
+                          itemBuilder: (context, index) {
+                            return _buildCommentThread(
+                              topLevelComments[index],
+                              comments,
+                            );
+                          },
                         );
-                      }
-                      final topLevelComments = comments.where((c) => c.parentCommentId == null).toList();
-                      return ListView.separated(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: topLevelComments.length,
-                        separatorBuilder: (_, __) => Divider(color: Colors.grey.shade200, height: 1),
-                        itemBuilder: (context, index) {
-                          return _buildCommentThread(topLevelComments[index], comments);
-                        },
-                      );
-                    },
-                    loading: () => const Center(child: Padding(padding: EdgeInsets.all(16), child: CircularProgressIndicator(color: AppColors.primary))),
-                    error: (err, stack) => Padding(padding: const EdgeInsets.all(16), child: Text('Lỗi tải bình luận: $err', style: AppTextStyles.body.copyWith(color: AppColors.error))),
-                  ),
-                  const SizedBox(height: 24),
-                ],
+                      },
+                      loading: () => const Center(
+                        child: Padding(
+                          padding: EdgeInsets.all(16),
+                          child: CircularProgressIndicator(
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ),
+                      error: (err, stack) => Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          'Lỗi tải bình luận: $err',
+                          style: AppTextStyles.body.copyWith(
+                            color: AppColors.error,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
               ),
             ),
-          ),
-          
+          ), // Closing parenthesis for RefreshIndicator
           // O nhap binh luan
           _buildCommentInput(myAvatarUrl),
         ],
@@ -211,8 +255,14 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
     );
   }
 
-  Widget _buildCommentThread(CommentModel comment, List<CommentModel> allComments, {bool isReply = false}) {
-    final replies = allComments.where((c) => c.parentCommentId == comment.id).toList();
+  Widget _buildCommentThread(
+    CommentModel comment,
+    List<CommentModel> allComments, {
+    bool isReply = false,
+  }) {
+    final replies = allComments
+        .where((c) => c.parentCommentId == comment.id)
+        .toList();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -221,7 +271,12 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
           Padding(
             padding: EdgeInsets.only(left: isReply ? 0 : 40),
             child: Column(
-              children: replies.map((reply) => _buildCommentThread(reply, allComments, isReply: true)).toList(),
+              children: replies
+                  .map(
+                    (reply) =>
+                        _buildCommentThread(reply, allComments, isReply: true),
+                  )
+                  .toList(),
             ),
           ),
       ],
@@ -230,7 +285,12 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
   Widget _buildCommentItem(CommentModel comment, {bool isReply = false}) {
     return Padding(
-      padding: EdgeInsets.only(left: 16, right: 16, top: isReply ? 8 : 16, bottom: isReply ? 8 : 16),
+      padding: EdgeInsets.only(
+        left: 16,
+        right: 16,
+        top: isReply ? 8 : 16,
+        bottom: isReply ? 8 : 16,
+      ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -242,10 +302,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                 context.push('/user/${comment.authorId}');
               }
             },
-            child: AppAvatar(
-              imageUrl: comment.authorAvatar,
-              radius: 18,
-            ),
+            child: AppAvatar(imageUrl: comment.authorAvatar, radius: 18),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -254,10 +311,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
               children: [
                 GestureDetector(
                   onTap: () {
-                      if (comment.isMine) {
-                        context.go('/profile');
+                    if (comment.isMine) {
+                      context.go('/profile');
                     } else {
-                        context.push('/user/${comment.authorId}');
+                      context.push('/user/${comment.authorId}');
                     }
                   },
                   child: Text(
@@ -266,10 +323,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                   ),
                 ),
                 const SizedBox(height: 4),
-                Text(
-                  comment.content,
-                  style: AppTextStyles.body,
-                ),
+                Text(comment.content, style: AppTextStyles.body),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -280,7 +334,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                     const SizedBox(width: 16),
                     GestureDetector(
                       onTap: () {
-                        setState(() { _replyingTo = comment; });
+                        setState(() {
+                          _replyingTo = comment;
+                        });
                         FocusScope.of(context).requestFocus(_commentFocusNode);
                       },
                       child: Text(
@@ -321,7 +377,9 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                 ),
                 GestureDetector(
                   onTap: () {
-                    setState(() { _replyingTo = null; });
+                    setState(() {
+                      _replyingTo = null;
+                    });
                   },
                   child: const Icon(Icons.close, size: 16, color: Colors.grey),
                 ),
@@ -329,76 +387,80 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             ),
           ),
         Container(
-      decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
-      ),
-      padding: EdgeInsets.only(
-        left: 16,
-        right: 16,
-        top: 12,
-        bottom: MediaQuery.of(context).padding.bottom + 12,
-      ),
-      child: Row(
-        children: [
-          GestureDetector(
-            onTap: () => context.go('/profile'),
-            child: AppAvatar(
-              imageUrl: userAvatar,
-              radius: 18
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: AppColors.inputBg,
-                borderRadius: BorderRadius.circular(24),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, -2),
               ),
-              child: TextField(
-                controller: _commentCtrl,
-                focusNode: _commentFocusNode,
-                decoration: InputDecoration(
-                  hintText: 'Thêm bình luận...',
-                  hintStyle: AppTextStyles.bodyGrey,
-                  border: InputBorder.none,
-                  isDense: true,
-                  contentPadding: const EdgeInsets.symmetric(vertical: 12),
+            ],
+          ),
+          padding: EdgeInsets.only(
+            left: 16,
+            right: 16,
+            top: 12,
+            bottom: MediaQuery.of(context).padding.bottom + 12,
+          ),
+          child: Row(
+            children: [
+              GestureDetector(
+                onTap: () => context.go('/profile'),
+                child: AppAvatar(imageUrl: userAvatar, radius: 18),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: AppColors.inputBg,
+                    borderRadius: BorderRadius.circular(24),
+                  ),
+                  child: TextField(
+                    controller: _commentCtrl,
+                    focusNode: _commentFocusNode,
+                    decoration: InputDecoration(
+                      hintText: 'Thêm bình luận...',
+                      hintStyle: AppTextStyles.bodyGrey,
+                      border: InputBorder.none,
+                      isDense: true,
+                      contentPadding: const EdgeInsets.symmetric(vertical: 12),
+                    ),
+                    style: AppTextStyles.body,
+                  ),
                 ),
-                style: AppTextStyles.body,
               ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.send, color: AppColors.primary),
-            onPressed: () async {
-              if (_commentCtrl.text.trim().isNotEmpty) {
-                FocusScope.of(context).unfocus();
-                final content = _commentCtrl.text;
-                _commentCtrl.clear();
-                
-                try {
-                  await ref.read(commentProvider(widget.postId).notifier).addComment(content, parentId: _replyingTo?.id);
-                  setState(() { _replyingTo = null; });
-                } catch (e) {
-                  if (context.mounted) {
-                    AppSnackbar.showError(context, ErrorMapper.parseError(e));
+              const SizedBox(width: 8),
+              IconButton(
+                icon: const Icon(Icons.send, color: AppColors.primary),
+                onPressed: () async {
+                  if (_commentCtrl.text.trim().isNotEmpty) {
+                    FocusScope.of(context).unfocus();
+                    final content = _commentCtrl.text;
+                    _commentCtrl.clear();
+
+                    try {
+                      await ref
+                          .read(commentProvider(widget.postId).notifier)
+                          .addComment(content, parentId: _replyingTo?.id);
+                      setState(() {
+                        _replyingTo = null;
+                      });
+                    } catch (e) {
+                      if (context.mounted) {
+                        AppSnackbar.showError(
+                          context,
+                          ErrorMapper.parseError(e),
+                        );
+                      }
+                    }
                   }
-                }
-              }
-            },
+                },
+              ),
+            ],
           ),
-        ],
-      ),
-    ),
+        ),
       ],
     );
   }
