@@ -1,13 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../models/admin_user_model.dart';
 import '../providers/admin_provider.dart';
 import '../widgets/admin_paginated_table.dart';
 import '../widgets/admin_search_filter_bar.dart';
 
-import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 
 final userSearchQueryProvider = StateProvider.autoDispose<String>((ref) => '');
 final userFilterStatusProvider = StateProvider.autoDispose<String>((ref) => 'all');
@@ -173,9 +175,18 @@ class AdminUsersScreen extends ConsumerWidget {
                   tooltip: isAdmin ? 'Hạ quyền xuống User' : 'Nâng cấp lên Admin',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  onPressed: () {
-                    ref.read(adminUsersProvider.notifier).changeUserRole(user.id, isAdmin ? 'USER' : 'ADMIN');
-                  },
+                    onPressed: () async {
+                      try {
+                        await ref.read(adminUsersProvider.notifier).changeUserRole(user.id, isAdmin ? 'USER' : 'ADMIN');
+                        if (context.mounted) {
+                          AppSnackbar.showSuccess(context, 'Cập nhật quyền thành công!');
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                        }
+                      }
+                    },
                 ),
                 const SizedBox(width: 4),
                 IconButton(
@@ -187,9 +198,18 @@ class AdminUsersScreen extends ConsumerWidget {
                   tooltip: isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản',
                   padding: EdgeInsets.zero,
                   constraints: const BoxConstraints(minWidth: 36, minHeight: 36),
-                  onPressed: () {
-                    ref.read(adminUsersProvider.notifier).toggleUserStatus(user.id);
-                  },
+                    onPressed: () async {
+                      try {
+                        await ref.read(adminUsersProvider.notifier).toggleUserStatus(user.id);
+                        if (context.mounted) {
+                          AppSnackbar.showSuccess(context, isLocked ? 'Mở khóa thành công!' : 'Khóa thành công!');
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                        }
+                      }
+                    },
                 ),
               ],
             ),

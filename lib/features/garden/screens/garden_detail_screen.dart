@@ -18,6 +18,8 @@ import '../widgets/reminder_form_bottom_sheet.dart';
 import 'plant_detail_screen.dart';
 import '../../../core/widgets/custom_tab_switcher.dart';
 import '../../../core/widgets/app_popup_menu.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 
 class GardenDetailScreen extends ConsumerStatefulWidget {
   final GardenModel garden;
@@ -82,15 +84,22 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
                 showDialog(
                   context: context,
                   builder: (_) => ConfirmDeleteDialog(
-                    title: 'Xác nhận xóa vườn',
-                    content: 'Bạn có chắc chắn muốn xóa vườn ${currentGarden.name} không?\nTất cả cây trong vườn cũng sẽ bị xóa. Hành động này không thể hoàn tác.',
-                    onConfirm: () async {
-                      final success = await ref.read(gardenProvider.notifier).deleteGarden(currentGarden.id);
-                      if (success && context.mounted) {
-                        Navigator.pop(context); // Pop GardenDetailScreen
-                      }
-                    },
-                  ),
+                      title: 'Xác nhận xóa vườn',
+                      content: 'Bạn có chắc chắn muốn xóa vườn ${currentGarden.name} không?\nTất cả cây trong vườn cũng sẽ bị xóa. Hành động này không thể hoàn tác.',
+                      onConfirm: () async {
+                        try {
+                          await ref.read(gardenProvider.notifier).deleteGarden(currentGarden.id);
+                          if (context.mounted) {
+                            Navigator.pop(context); // Pop GardenDetailScreen
+                            AppSnackbar.showSuccess(context, 'Đã xóa vườn');
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                          }
+                        }
+                      },
+                    ),
                 );
               }
             },

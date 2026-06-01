@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../post/models/post_model.dart';
 import '../../post/widgets/post_card.dart';
 import '../models/admin_post_model.dart';
@@ -152,7 +154,16 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
                   icon: Icon(post.isVisible ? Icons.visibility_off_outlined : Icons.restore, color: post.isVisible ? Colors.orange : Colors.green, size: 20),
                   tooltip: post.isVisible ? 'Ẩn bài đăng' : 'Hoàn tác ẩn',
                   onPressed: () async {
-                    await ref.read(adminPostsProvider.notifier).togglePostVisibility(post.id);
+                    try {
+                      await ref.read(adminPostsProvider.notifier).togglePostVisibility(post.id);
+                      if (context.mounted) {
+                        AppSnackbar.showSuccess(context, post.isVisible ? 'Đã ẩn bài viết!' : 'Đã hoàn tác ẩn bài viết!');
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                      }
+                    }
                   },
                 ),
               ],

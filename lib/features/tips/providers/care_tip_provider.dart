@@ -97,7 +97,7 @@ class CareTipNotifier extends StateNotifier<CareTipState> {
       state = state.copyWith(tips: [newTip, ...state.tips]);
       return true;
     } catch (e) {
-      return false;
+      rethrow;
     }
   }
 
@@ -115,7 +115,7 @@ class CareTipNotifier extends StateNotifier<CareTipState> {
       );
       return true;
     } catch (e) {
-      return false;
+      rethrow;
     }
   }
 
@@ -127,7 +127,7 @@ class CareTipNotifier extends StateNotifier<CareTipState> {
       );
       return true;
     } catch (e) {
-      return false;
+      rethrow;
     }
   }
 }

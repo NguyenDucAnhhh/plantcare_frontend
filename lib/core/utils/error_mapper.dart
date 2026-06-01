@@ -13,7 +13,7 @@ class ErrorMapper {
     }
     
     // Nếu không phải lỗi HTTP (VD: mất mạng, lỗi code)
-    return 'Lỗi hệ thống hoặc không có kết nối mạng.';
+    return 'Lỗi hệ thống hoặc không có kết nối mạng!';
   }
 
   static String getErrorMessage(String? errorCode, String? fallbackMessage) {
@@ -24,9 +24,9 @@ class ErrorMapper {
         case 'AUTH_LOCKED':
           return 'Tài khoản của bạn đã bị khóa. Vui lòng liên hệ Admin!';
         case 'AUTH_INVALID_CREDENTIALS':
-          return 'Email hoặc mật khẩu không chính xác.';
+          return 'Email hoặc mật khẩu không chính xác!';
         case 'AUTH_EMAIL_EXISTS':
-          return 'Email đã được sử dụng';
+          return 'Email đã được sử dụng!';
         case 'AUTH_INVALID_OTP':
           return 'Mã OTP không hợp lệ!';
         case 'AUTH_OTP_EXPIRED':
@@ -39,8 +39,6 @@ class ErrorMapper {
           return 'Bạn không thể tự theo dõi chính mình!';
 
         // --- Permissions & Access ---
-        case 'FORBIDDEN_ADMIN_ONLY':
-          return 'Chỉ Quản trị viên (ADMIN) mới có quyền thực hiện hành động này!';
         case 'FORBIDDEN_DELETE_COMMENT':
           return 'Bạn không có quyền xóa bình luận này!';
         case 'FORBIDDEN_RATE_DIAGNOSIS':
@@ -64,18 +62,36 @@ class ErrorMapper {
         case 'INVALID_ACTION':
           return 'Hành động không hợp lệ!';
         case 'UPLOAD_AVATAR_FAILED':
-          return 'Lỗi khi tải ảnh đại diện lên.';
+          return 'Lỗi khi tải ảnh đại diện lên!';
           
-        // Thêm các mã lỗi mới vào đây trong tương lai
+        // --- Not Found Entities ---
+        case 'COMMENT_NOT_FOUND':
+          return 'Bình luận không tồn tại!';
+        case 'POST_NOT_FOUND':
+          return 'Bài viết không tồn tại!';
+        case 'GARDEN_NOT_FOUND':
+          return 'Khu vườn không tồn tại!';
+        case 'PLANT_NOT_FOUND':
+          return 'Không tìm thấy cây!';
+        case 'TIP_NOT_FOUND':
+          return 'Không tìm thấy mẹo chăm sóc!';
+        case 'REMINDER_NOT_FOUND':
+          return 'Lịch nhắc nhở không tồn tại!';
+        case 'DIAGNOSIS_NOT_FOUND':
+          return 'Không tìm thấy kết quả chẩn đoán này!';
+        case 'NOTIFICATION_NOT_FOUND':
+          return 'Thông báo không tồn tại!';
+        case 'REPORT_TICKET_NOT_FOUND':
+          return 'Đơn báo cáo không tồn tại!';
       }
     }
 
     // 2. Nếu không tìm thấy mã lỗi, dùng câu tiếng Việt dự phòng từ Backend gửi về
     if (fallbackMessage != null && fallbackMessage.isNotEmpty) {
-      return fallbackMessage;
+      return fallbackMessage.endsWith('!') ? fallbackMessage : '$fallbackMessage!';
     }
 
     // 3. Nếu không có gì cả, trả về lỗi chung chung
-    return 'Lỗi hệ thống. Vui lòng thử lại sau.';
+    return 'Lỗi hệ thống. Vui lòng thử lại sau!';
   }
 }

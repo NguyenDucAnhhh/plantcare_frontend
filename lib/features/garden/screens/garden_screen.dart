@@ -9,6 +9,8 @@ import '../../../core/widgets/confirm_delete_dialog.dart';
 import 'garden_detail_screen.dart';
 import '../../../core/widgets/custom_header.dart';
 import '../../../core/widgets/app_popup_menu.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 
 class GardenScreen extends ConsumerStatefulWidget {
   const GardenScreen({super.key});
@@ -32,6 +34,12 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    ref.listen(gardenProvider, (previous, next) {
+      if (next.error != null && next.error!.isNotEmpty && (previous?.error != next.error)) {
+        AppSnackbar.showError(context, ErrorMapper.parseError(next.error!));
+      }
+    });
+
     final gardenState = ref.watch(gardenProvider);
 
     return Scaffold(
@@ -48,9 +56,7 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
       ),
       body: gardenState.isLoading && gardenState.gardens.isEmpty
           ? const Center(child: CircularProgressIndicator(color: AppColors.primary))
-          : gardenState.error != null && gardenState.gardens.isEmpty
-              ? Center(child: Text('Lỗi: ${gardenState.error}'))
-              : gardenState.gardens.isEmpty
+          : gardenState.gardens.isEmpty
                   ? Center(
                       child: Text(
                         'Bạn chưa có vườn nào.\nHãy bấm + để thêm vườn nhé!',

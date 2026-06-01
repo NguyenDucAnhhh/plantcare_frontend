@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../post/models/post_model.dart';
 import '../../post/widgets/post_card.dart';
 import '../models/admin_report_model.dart';
@@ -166,8 +168,17 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                     size: 20,
                   ),
                   tooltip: 'Bỏ qua (Giữ bài)',
-                  onPressed: () {
-                    ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'KEEP_POST');
+                  onPressed: () async {
+                    try {
+                      await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'KEEP_POST');
+                      if (context.mounted) {
+                        AppSnackbar.showSuccess(context, 'Đã giữ lại bài viết!');
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                      }
+                    }
                   },
                 ),
                 IconButton(
@@ -178,10 +189,19 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                   ),
                   tooltip: report.status == 'DELETED' ? 'Hoàn tác ẩn' : 'Ẩn bài đăng',
                   onPressed: () async {
-                    if (report.status == 'DELETED') {
-                      await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'RESTORE_POST');
-                    } else {
-                      await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'DELETE_POST');
+                    try {
+                      if (report.status == 'DELETED') {
+                        await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'RESTORE_POST');
+                      } else {
+                        await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'DELETE_POST');
+                      }
+                      if (context.mounted) {
+                        AppSnackbar.showSuccess(context, 'Xử lý báo cáo thành công!');
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                      }
                     }
                   },
                 ),

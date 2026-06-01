@@ -72,8 +72,8 @@ class GardenNotifier extends StateNotifier<GardenState> {
       );
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      return false;
+      state = state.copyWith(isLoading: false);
+      rethrow;
     }
   }
 
@@ -111,8 +111,8 @@ class GardenNotifier extends StateNotifier<GardenState> {
       state = state.copyWith(isLoading: false, gardens: updatedList);
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      return false;
+      state = state.copyWith(isLoading: false);
+      rethrow;
     }
   }
 
@@ -129,8 +129,8 @@ class GardenNotifier extends StateNotifier<GardenState> {
       return true;
     } catch (e) {
       // Neu API loi, khoi phuc lai danh sach cu de nguoi dung biet co loi xay ra
-      state = state.copyWith(gardens: previousList, error: 'Xóa vườn thất bại: ${e.toString()}');
-      return false;
+      state = state.copyWith(gardens: previousList);
+      rethrow;
     }
   }
 }

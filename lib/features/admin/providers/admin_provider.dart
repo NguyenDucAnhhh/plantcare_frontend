@@ -35,7 +35,7 @@ class AdminUsersNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
       // Refresh list after success
       fetchUsers();
     } catch (e) {
-      // Handle error visually if possible, or just ignore for now
+      rethrow;
     }
   }
 
@@ -44,7 +44,7 @@ class AdminUsersNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
       await _repository.changeUserRole(id, role);
       fetchUsers();
     } catch (e) {
-      // Handle error
+      rethrow;
     }
   }
 }

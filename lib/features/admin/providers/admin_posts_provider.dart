@@ -65,7 +65,7 @@ class AdminPostsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
       _ref.invalidate(adminReportsProvider);
       return true;
     } catch (e) {
-      return false;
+      rethrow;
     }
   }
 }

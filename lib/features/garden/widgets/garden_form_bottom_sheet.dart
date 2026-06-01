@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/custom_bottom_sheet_form.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../models/garden_model.dart';
 import '../providers/garden_provider.dart';
 
@@ -60,27 +62,34 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
     final isUpdate = widget.garden != null;
     final notifier = ref.read(gardenProvider.notifier);
 
-    bool success = false;
-    if (isUpdate) {
-      success = await notifier.updateGarden(
-        id: widget.garden!.id,
-        name: _nameCtrl.text.trim(),
-        location: _locCtrl.text.trim(),
-        description: _descCtrl.text.trim(),
-        imagePath: _localImagePath,
-        currentImageUrl: _currentImageUrl,
-      );
-    } else {
-      success = await notifier.createGarden(
-        name: _nameCtrl.text.trim(),
-        location: _locCtrl.text.trim(),
-        description: _descCtrl.text.trim(),
-        imagePath: _localImagePath,
-      );
-    }
+    try {
+      if (isUpdate) {
+        await notifier.updateGarden(
+          id: widget.garden!.id,
+          name: _nameCtrl.text.trim(),
+          location: _locCtrl.text.trim(),
+          description: _descCtrl.text.trim(),
+          imagePath: _localImagePath,
+          currentImageUrl: _currentImageUrl,
+        );
+        if (mounted) AppSnackbar.showSuccess(context, 'Cập nhật vườn thành công');
+      } else {
+        await notifier.createGarden(
+          name: _nameCtrl.text.trim(),
+          location: _locCtrl.text.trim(),
+          description: _descCtrl.text.trim(),
+          imagePath: _localImagePath,
+        );
+        if (mounted) AppSnackbar.showSuccess(context, 'Thêm vườn mới thành công');
+      }
 
-    if (success && mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+      }
     }
   }
 

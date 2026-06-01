@@ -32,7 +32,7 @@ class AdminReportsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>
       fetchReports();
       _ref.invalidate(adminPostsProvider);
     } catch (e) {
-      // Handle error
+      rethrow;
     }
   }
 }

@@ -10,6 +10,7 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../../tips/providers/care_tip_provider.dart';
 import '../../tips/data/care_tip_model.dart';
 
@@ -99,22 +100,26 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
       'category': _selectedCategory,
     };
 
-    bool success;
-    if (widget.initialTip != null) {
-      success = await ref.read(careTipProvider.notifier)
-          .updateTip(widget.initialTip!.id, data, imageFile: _coverImageFile);
-    } else {
-      success = await ref.read(careTipProvider.notifier)
-          .createTip(data, imageFile: _coverImageFile);
-    }
+    try {
+      if (widget.initialTip != null) {
+        await ref.read(careTipProvider.notifier)
+            .updateTip(widget.initialTip!.id, data, imageFile: _coverImageFile);
+      } else {
+        await ref.read(careTipProvider.notifier)
+            .createTip(data, imageFile: _coverImageFile);
+      }
 
-    setState(() => _isSaving = false);
+      setState(() => _isSaving = false);
 
-    if (success && mounted) {
-      AppSnackbar.showSuccess(context, widget.initialTip != null ? 'Cập nhật thành công!' : 'Xuất bản thành công!');
-      context.pop();
-    } else if (mounted) {
-      AppSnackbar.showError(context, 'Có lỗi xảy ra, vui lòng thử lại!');
+      if (mounted) {
+        AppSnackbar.showSuccess(context, widget.initialTip != null ? 'Cập nhật thành công!' : 'Xuất bản thành công!');
+        context.pop();
+      }
+    } catch (e) {
+      setState(() => _isSaving = false);
+      if (mounted) {
+        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+      }
     }
   }
 
