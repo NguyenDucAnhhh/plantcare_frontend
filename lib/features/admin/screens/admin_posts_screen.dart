@@ -145,7 +145,7 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.visibility_outlined, color: AppColors.primary, size: 20),
-                  tooltip: 'Xem bài viết',
+                  tooltip: 'Xem bài đăng',
                   onPressed: () {
                     _showPostDetails(context, post);
                   },
@@ -157,7 +157,7 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
                     try {
                       await ref.read(adminPostsProvider.notifier).togglePostVisibility(post.id);
                       if (context.mounted) {
-                        AppSnackbar.showSuccess(context, post.isVisible ? 'Đã ẩn bài viết!' : 'Đã hoàn tác ẩn bài viết!');
+                        AppSnackbar.showSuccess(context, post.isVisible ? 'Đã ẩn bài đăng!' : 'Đã hoàn tác ẩn bài đăng!');
                       }
                     } catch (e) {
                       if (context.mounted) {

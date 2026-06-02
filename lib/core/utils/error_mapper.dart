@@ -50,15 +50,15 @@ class ErrorMapper {
         case 'FORBIDDEN_PLANT_ACCESS':
           return 'Bạn không có quyền truy cập hoặc thao tác với cây này!';
         case 'FORBIDDEN_EDIT_POST':
-          return 'Bạn không có quyền sửa bài viết của người khác!';
+          return 'Bạn không có quyền sửa bài đăng của người khác!';
         case 'FORBIDDEN_DELETE_POST':
-          return 'Bạn không có quyền xóa bài viết của người khác!';
+          return 'Bạn không có quyền xóa bài đăng của người khác!';
         case 'FORBIDDEN_EDIT_REMINDER':
           return 'Bạn không có quyền sửa báo thức này!';
         
         // --- Content ---
         case 'POST_HIDDEN':
-          return 'Bài viết đã bị ẩn!';
+          return 'Bài đăng đã bị ẩn!';
         case 'INVALID_ACTION':
           return 'Hành động không hợp lệ!';
         case 'UPLOAD_AVATAR_FAILED':
@@ -68,7 +68,7 @@ class ErrorMapper {
         case 'COMMENT_NOT_FOUND':
           return 'Bình luận không tồn tại!';
         case 'POST_NOT_FOUND':
-          return 'Bài viết không tồn tại!';
+          return 'Bài đăng không tồn tại!';
         case 'GARDEN_NOT_FOUND':
           return 'Khu vườn không tồn tại!';
         case 'PLANT_NOT_FOUND':

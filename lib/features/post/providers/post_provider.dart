@@ -201,7 +201,7 @@ class PostNotifier extends StateNotifier<PostState> {
     try {
       await _repository.reportPost(postId, reason);
     } catch (e) {
-      throw Exception('Lỗi khi báo cáo bài viết: $e');
+      throw Exception('Lỗi khi báo cáo bài đăng: $e');
     }
   }
 }

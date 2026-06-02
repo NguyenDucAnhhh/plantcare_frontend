@@ -48,7 +48,7 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text('Xác nhận xóa'),
-        content: const Text('Bạn có chắc chắn muốn xóa bài viết này không? Hành động này không thể hoàn tác.'),
+        content: const Text('Bạn có chắc chắn muốn xóa bài đăng này không? Hành động này không thể hoàn tác.'),
         actions: [
           TextButton(onPressed: () => Navigator.pop(ctx), child: const Text('Hủy')),
           TextButton(
@@ -56,7 +56,7 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
               Navigator.pop(ctx);
               final success = await ref.read(adminTipsProvider.notifier).deleteTip(id);
               if (success && mounted) {
-                AppSnackbar.showSuccess(context, 'Đã xóa bài viết');
+                AppSnackbar.showSuccess(context, 'Đã xóa bài đăng');
               }
             },
             child: const Text('Xóa', style: TextStyle(color: Colors.red)),
@@ -81,7 +81,7 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
             ElevatedButton.icon(
               onPressed: () => context.push('/admin/tips/edit'),
               icon: const Icon(Icons.add),
-              label: const Text('Thêm bài viết'),
+              label: const Text('Thêm bài đăng'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,

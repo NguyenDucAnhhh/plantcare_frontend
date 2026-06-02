@@ -156,7 +156,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
               children: [
                 IconButton(
                   icon: const Icon(Icons.visibility_outlined, color: AppColors.primary, size: 20),
-                  tooltip: 'Xem bài viết',
+                  tooltip: 'Xem bài đăng',
                   onPressed: () {
                     _showPostDetails(context, report);
                   },
@@ -172,7 +172,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                     try {
                       await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'KEEP_POST');
                       if (context.mounted) {
-                        AppSnackbar.showSuccess(context, 'Đã giữ lại bài viết!');
+                        AppSnackbar.showSuccess(context, 'Đã giữ lại bài đăng!');
                       }
                     } catch (e) {
                       if (context.mounted) {

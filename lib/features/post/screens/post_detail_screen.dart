@@ -57,12 +57,12 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
 
     final myAvatarUrl = profileState.profile?['avatarUrl'];
 
-    // 2. Tìm bài viết cụ thể trong danh sách posts của state mới
+    // 2. Tìm bài đăng cụ thể trong danh sách posts của state mới
     final post = postsState.posts.firstWhere(
       (p) => p.id == widget.postId,
       orElse: () => PostModel(
         id: widget.postId,
-        content: 'Không tìm thấy bài viết',
+        content: 'Không tìm thấy bài đăng',
         authorId: '',
         authorName: '',
         authorAvatar: '',

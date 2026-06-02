@@ -115,7 +115,7 @@ class _TipsScreenState extends ConsumerState<TipsScreen> {
                 : tipsState.error != null
                     ? Center(child: Text('Lỗi: ${tipsState.error}', style: AppTextStyles.bodyGrey))
                     : tipsState.filteredTips.isEmpty
-                        ? Center(child: Text('Không tìm thấy bài viết nào.', style: AppTextStyles.bodyGrey))
+                        ? Center(child: Text('Không tìm thấy bài đăng nào.', style: AppTextStyles.bodyGrey))
                         : RefreshIndicator(
                             color: AppColors.primary,
                             onRefresh: () async {

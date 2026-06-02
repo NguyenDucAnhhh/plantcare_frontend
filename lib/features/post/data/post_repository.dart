@@ -14,7 +14,7 @@ class PostRepository {
 
   PostRepository();
 
-  // Lấy danh sách tất cả bài viết trên Newfeed
+  // Lấy danh sách tất cả bài đăng trên Newfeed
   Future<List<PostModel>> getAllVisiblePosts({int page = 0, int size = 5}) async {
     try {
       final response = await _dio.get(
@@ -33,13 +33,13 @@ class PostRepository {
       if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
         throw Exception('Phiên đăng nhập đã hết hạn. Vui lòng vào Cài đặt -> Đăng xuất và Đăng nhập lại.');
       }
-      throw Exception('Lỗi khi lấy danh sách bài viết: $e');
+      throw Exception('Lỗi khi lấy danh sách bài đăng: $e');
     } catch (e) {
       throw Exception('Lỗi không xác định: $e');
     }
   }
 
-  // Lấy danh sách bài viết của mình
+  // Lấy danh sách bài đăng của mình
   Future<List<PostModel>> getMyPosts() async {
     try {
       final response = await _dio.get('/api/posts/me');
@@ -49,11 +49,11 @@ class PostRepository {
       }
       return [];
     } catch (e) {
-      throw Exception('Lỗi khi lấy danh sách bài viết của tôi: $e');
+      throw Exception('Lỗi khi lấy danh sách bài đăng của tôi: $e');
     }
   }
 
-  // Lấy danh sách bài viết của những người mình đang theo dõi
+  // Lấy danh sách bài đăng của những người mình đang theo dõi
   Future<List<PostModel>> getFollowingPosts({int page = 0, int size = 5}) async {
     try {
       final response = await _dio.get('/api/posts/following', queryParameters: {
@@ -63,11 +63,11 @@ class PostRepository {
       final List<dynamic> data = response.data;
       return data.map((json) => PostModel.fromJson(json)).toList();
     } catch (e) {
-      throw Exception('Lỗi khi lấy bài viết đang theo dõi: $e');
+      throw Exception('Lỗi khi lấy bài đăng đang theo dõi: $e');
     }
   }
 
-  // Tìm kiếm bài viết
+  // Tìm kiếm bài đăng
   Future<List<PostModel>> searchPosts(String keyword, {int page = 0, int size = 20}) async {
     try {
       final response = await _dio.get(
@@ -84,7 +84,7 @@ class PostRepository {
       }
       return [];
     } catch (e) {
-      throw Exception('Lỗi khi tìm kiếm bài viết: $e');
+      throw Exception('Lỗi khi tìm kiếm bài đăng: $e');
     }
   }
 
@@ -117,20 +117,20 @@ class PostRepository {
     }
   }
 
-  // Lấy 1 bài viết theo ID
+  // Lấy 1 bài đăng theo ID
   Future<PostModel> getPostById(String postId) async {
     try {
       final response = await _dio.get('/api/posts/$postId');
       if (response.data != null) {
         return PostModel.fromJson(response.data);
       }
-      throw Exception('Không tìm thấy bài viết');
+      throw Exception('Không tìm thấy bài đăng');
     } catch (e) {
-      throw Exception('Lỗi khi lấy thông tin bài viết: $e');
+      throw Exception('Lỗi khi lấy thông tin bài đăng: $e');
     }
   }
 
-  // Tạo bài viết mới
+  // Tạo bài đăng mới
   Future<PostModel> createPost({required String content, List<String> imageUrls = const []}) async {
     try {
       final response = await _dio.post(
@@ -142,11 +142,11 @@ class PostRepository {
       );
       return PostModel.fromJson(response.data);
     } catch (e) {
-      throw Exception('Lỗi khi tạo bài viết: $e');
+      throw Exception('Lỗi khi tạo bài đăng: $e');
     }
   }
 
-  // Cập nhật bài viết
+  // Cập nhật bài đăng
   Future<PostModel> updatePost(String postId, {required String content, List<String> imageUrls = const []}) async {
     try {
       final response = await _dio.put(
@@ -158,11 +158,11 @@ class PostRepository {
       );
       return PostModel.fromJson(response.data);
     } catch (e) {
-      throw Exception('Lỗi khi cập nhật bài viết: $e');
+      throw Exception('Lỗi khi cập nhật bài đăng: $e');
     }
   }
 
-  // Xóa bài viết
+  // Xóa bài đăng
   Future<void> deletePost(String postId) async {
     try {
       await _dio.delete(
@@ -170,7 +170,7 @@ class PostRepository {
         options: Options(responseType: ResponseType.plain),
       );
     } catch (e) {
-      throw Exception('Lỗi khi xóa bài viết: $e');
+      throw Exception('Lỗi khi xóa bài đăng: $e');
     }
   }
 

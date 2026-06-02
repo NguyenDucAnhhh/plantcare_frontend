@@ -85,7 +85,7 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
 
   Future<void> _saveTip() async {
     if (_titleController.text.trim().isEmpty) {
-      AppSnackbar.showError(context, 'Vui lòng nhập tiêu đề bài viết');
+      AppSnackbar.showError(context, 'Vui lòng nhập tiêu đề bài đăng');
       return;
     }
 
@@ -135,7 +135,7 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          widget.initialTip != null ? 'Chỉnh sửa bài viết' : 'Bài viết mới',
+          widget.initialTip != null ? 'Chỉnh sửa bài đăng' : 'Bài đăng mới',
           style: AppTextStyles.body.copyWith(color: Colors.black54),
         ),
         centerTitle: true,
@@ -232,7 +232,7 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
                       controller: _titleController,
                       style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w800, color: Colors.black87),
                       decoration: const InputDecoration(
-                        hintText: 'Tiêu đề bài viết...',
+                        hintText: 'Tiêu đề bài đăng...',
                         hintStyle: TextStyle(color: Colors.black26),
                         border: InputBorder.none,
                       ),
