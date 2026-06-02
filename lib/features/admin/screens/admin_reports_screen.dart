@@ -163,6 +163,26 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                   },
                 ),
                 IconButton(
+                  icon: Icon(
+                    Icons.check_circle_outline, 
+                    color: report.status == 'KEPT' ? Colors.grey : Colors.green,
+                    size: 20,
+                  ),
+                  tooltip: 'Bỏ qua (Giữ bài)',
+                  onPressed: () async {
+                    try {
+                      await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'KEEP_POST');
+                      if (context.mounted) {
+                        AppSnackbar.showSuccess(context, 'Đã giữ lại bài đăng!');
+                      }
+                    } catch (e) {
+                      if (context.mounted) {
+                        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                      }
+                    }
+                  },
+                ),
+                IconButton(
                   icon: Icon(report.postIsVisible ? Icons.visibility_off_outlined : Icons.restore, color: report.postIsVisible ? Colors.orange : Colors.green, size: 20),
                   tooltip: report.postIsVisible ? 'Ẩn bài đăng' : 'Hoàn tác ẩn',
                   onPressed: () async {
