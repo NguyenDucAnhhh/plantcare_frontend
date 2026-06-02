@@ -32,8 +32,26 @@ class AdminUsersNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
   Future<void> toggleUserStatus(int id) async {
     try {
       await _repository.toggleUserStatus(id);
-      // Refresh list after success
-      fetchUsers();
+      if (state.hasValue) {
+        final data = state.value!;
+        final content = data['content'] as List<AdminUserModel>? ?? [];
+        final updatedList = content.map((user) {
+          if (user.id == id) {
+            return AdminUserModel(
+              id: user.id,
+              fullName: user.fullName,
+              email: user.email,
+              avatarUrl: user.avatarUrl,
+              role: user.role,
+              isActive: !user.isActive,
+              createdAt: user.createdAt,
+            );
+          }
+          return user;
+        }).toList();
+        data['content'] = updatedList;
+        state = AsyncValue.data(data);
+      }
     } catch (e) {
       rethrow;
     }
@@ -42,7 +60,26 @@ class AdminUsersNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
   Future<void> changeUserRole(int id, String role) async {
     try {
       await _repository.changeUserRole(id, role);
-      fetchUsers();
+      if (state.hasValue) {
+        final data = state.value!;
+        final content = data['content'] as List<AdminUserModel>? ?? [];
+        final updatedList = content.map((user) {
+          if (user.id == id) {
+            return AdminUserModel(
+              id: user.id,
+              fullName: user.fullName,
+              email: user.email,
+              avatarUrl: user.avatarUrl,
+              role: role,
+              isActive: user.isActive,
+              createdAt: user.createdAt,
+            );
+          }
+          return user;
+        }).toList();
+        data['content'] = updatedList;
+        state = AsyncValue.data(data);
+      }
     } catch (e) {
       rethrow;
     }
