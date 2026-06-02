@@ -163,11 +163,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(
-                    report.postIsVisible ? Icons.visibility_off : Icons.visibility,
-                    color: report.postIsVisible ? Colors.red : Colors.green,
-                    size: 20,
-                  ),
+                  icon: Icon(report.postIsVisible ? Icons.visibility_off_outlined : Icons.restore, color: report.postIsVisible ? Colors.orange : Colors.green, size: 20),
                   tooltip: report.postIsVisible ? 'Ẩn bài đăng' : 'Hoàn tác ẩn',
                   onPressed: () async {
                     try {
