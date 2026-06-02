@@ -9,6 +9,7 @@ import '../../post/models/post_model.dart';
 import '../../post/widgets/post_card.dart';
 import '../models/admin_report_model.dart';
 import '../providers/admin_reports_provider.dart';
+import '../providers/admin_posts_provider.dart';
 import '../widgets/admin_paginated_table.dart';
 import '../widgets/admin_search_filter_bar.dart';
 
@@ -163,40 +164,16 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                 ),
                 IconButton(
                   icon: Icon(
-                    Icons.check_circle_outline, 
-                    color: report.status == 'KEPT' ? Colors.grey : Colors.green,
+                    report.postIsVisible ? Icons.visibility_off : Icons.visibility,
+                    color: report.postIsVisible ? Colors.red : Colors.green,
                     size: 20,
                   ),
-                  tooltip: 'Bỏ qua (Giữ bài)',
+                  tooltip: report.postIsVisible ? 'Ẩn bài đăng' : 'Hoàn tác ẩn',
                   onPressed: () async {
                     try {
-                      await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'KEEP_POST');
+                      await ref.read(adminPostsProvider.notifier).togglePostVisibility(report.postId);
                       if (context.mounted) {
-                        AppSnackbar.showSuccess(context, 'Đã giữ lại bài đăng!');
-                      }
-                    } catch (e) {
-                      if (context.mounted) {
-                        AppSnackbar.showError(context, ErrorMapper.parseError(e));
-                      }
-                    }
-                  },
-                ),
-                IconButton(
-                  icon: Icon(
-                    report.status == 'DELETED' ? Icons.restore : Icons.visibility_off_outlined, 
-                    color: report.status == 'DELETED' ? Colors.green : Colors.orange,
-                    size: 20,
-                  ),
-                  tooltip: report.status == 'DELETED' ? 'Hoàn tác ẩn' : 'Ẩn bài đăng',
-                  onPressed: () async {
-                    try {
-                      if (report.status == 'DELETED') {
-                        await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'RESTORE_POST');
-                      } else {
-                        await ref.read(adminReportsProvider.notifier).resolveReport(report.id, 'DELETE_POST');
-                      }
-                      if (context.mounted) {
-                        AppSnackbar.showSuccess(context, 'Xử lý báo cáo thành công!');
+                        AppSnackbar.showSuccess(context, report.postIsVisible ? 'Đã ẩn bài đăng!' : 'Đã hoàn tác ẩn bài đăng!');
                       }
                     } catch (e) {
                       if (context.mounted) {

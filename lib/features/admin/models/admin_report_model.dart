@@ -13,6 +13,7 @@ class AdminReportModel {
   final List<String> postImageUrls;
   final int postLikeCount;
   final int postCommentCount;
+  final bool postIsVisible;
   final DateTime postCreatedAt;
 
   AdminReportModel({
@@ -30,6 +31,7 @@ class AdminReportModel {
     this.postImageUrls = const [],
     this.postLikeCount = 0,
     this.postCommentCount = 0,
+    this.postIsVisible = true,
     required this.postCreatedAt,
   });
 
@@ -49,6 +51,7 @@ class AdminReportModel {
       postImageUrls: json['postImageUrls'] != null ? List<String>.from(json['postImageUrls']) : [],
       postLikeCount: json['postLikeCount'] as int? ?? 0,
       postCommentCount: json['postCommentCount'] as int? ?? 0,
+      postIsVisible: json['postIsVisible'] as bool? ?? true,
       postCreatedAt: json['postCreatedAt'] != null ? DateTime.parse(json['postCreatedAt']) : DateTime.now(),
     );
   }
