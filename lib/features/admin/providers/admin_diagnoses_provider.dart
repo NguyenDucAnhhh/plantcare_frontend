@@ -22,9 +22,9 @@ class AdminDiagnosesNotifier extends StateNotifier<AsyncValue<Map<String, dynami
     fetchDiagnoses();
   }
 
-  Future<void> fetchDiagnoses({int page = 0}) async {
+  Future<void> fetchDiagnoses({int page = 0, bool silent = false}) async {
     try {
-      if (page == 0) state = const AsyncValue.loading();
+      if (page == 0 && !silent) state = const AsyncValue.loading();
       
       final dio = ApiClient.instance;
       
@@ -61,7 +61,7 @@ class AdminDiagnosesNotifier extends StateNotifier<AsyncValue<Map<String, dynami
         'isCorrect': isCorrect,
         'adminNote': note
       });
-      fetchDiagnoses(page: _page); // Refresh current page
+      fetchDiagnoses(page: _page, silent: true); // Refresh current page
       return true;
     } catch (e) {
       return false;

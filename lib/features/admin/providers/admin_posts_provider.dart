@@ -17,8 +17,8 @@ class AdminPostsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
     loadPosts();
   }
 
-  Future<void> loadPosts({int page = 0}) async {
-    if (page == 0) state = const AsyncValue.loading();
+  Future<void> loadPosts({int page = 0, bool silent = false}) async {
+    if (page == 0 && !silent) state = const AsyncValue.loading();
     try {
       final response = await _dio.get('/api/admin/posts', queryParameters: {'page': page, 'size': 10});
       if (response.statusCode == 200) {
@@ -40,28 +40,7 @@ class AdminPostsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
   Future<bool> togglePostVisibility(int id) async {
     try {
       await _dio.put('/api/admin/posts/$id/toggle-visibility');
-      // Update local state instead of full reload for better UX
-      if (state.hasValue) {
-        final data = state.value!;
-        final content = data['content'] as List<AdminPostModel>? ?? [];
-        final updatedList = content.map((post) {
-          if (post.id == id) {
-            return AdminPostModel(
-              id: post.id,
-              authorName: post.authorName,
-              authorEmail: post.authorEmail,
-              content: post.content,
-              imageUrls: post.imageUrls,
-              isVisible: !post.isVisible,
-              likeCount: post.likeCount,
-              createdAt: post.createdAt,
-            );
-          }
-          return post;
-        }).toList();
-        data['content'] = updatedList;
-        state = AsyncValue.data(data);
-      }
+      loadPosts(silent: true);
       _ref.invalidate(adminReportsProvider);
       return true;
     } catch (e) {

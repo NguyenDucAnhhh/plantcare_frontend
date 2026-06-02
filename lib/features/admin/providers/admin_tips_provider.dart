@@ -16,8 +16,8 @@ class AdminTipsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>> 
     loadTips();
   }
 
-  Future<void> loadTips({int page = 0}) async {
-    if (page == 0) state = const AsyncValue.loading();
+  Future<void> loadTips({int page = 0, bool silent = false}) async {
+    if (page == 0 && !silent) state = const AsyncValue.loading();
     try {
       final response = await _dio.get('/api/admin/tips', queryParameters: {'page': page, 'size': 10});
       if (response.statusCode == 200) {
@@ -40,7 +40,7 @@ class AdminTipsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>> 
     // Delete via the user-side provider to share logic, then refresh this admin list
     final success = await _ref.read(careTipProvider.notifier).deleteTip(id);
     if (success) {
-      loadTips();
+      loadTips(silent: true);
     }
     return success;
   }

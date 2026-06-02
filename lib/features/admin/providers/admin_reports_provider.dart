@@ -13,8 +13,8 @@ class AdminReportsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>
     fetchReports();
   }
 
-  Future<void> fetchReports({int page = 0}) async {
-    if (page == 0) state = const AsyncValue.loading();
+  Future<void> fetchReports({int page = 0, bool silent = false}) async {
+    if (page == 0 && !silent) state = const AsyncValue.loading();
     try {
       final Map<String, dynamic> data = await _repository.getReports(page, 10);
       final content = data['content'] as List<dynamic>? ?? [];
@@ -29,40 +29,7 @@ class AdminReportsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>
   Future<void> resolveReport(int id, String action) async {
     try {
       await _repository.resolveReport(id, action);
-      if (state.hasValue) {
-        final data = state.value!;
-        final content = data['content'] as List<AdminReportModel>? ?? [];
-        
-        final targetReportIndex = content.indexWhere((r) => r.id == id);
-        if (targetReportIndex != -1) {
-          final targetPostId = content[targetReportIndex].postId;
-          final newStatus = action == 'DELETE_POST' ? 'DELETED' : 'KEPT';
-          final newVisibility = action != 'DELETE_POST';
-
-          final updatedList = content.map((report) {
-            if (report.postId == targetPostId) {
-              return AdminReportModel(
-                id: report.id,
-                reporterId: report.reporterId,
-                reporterName: report.reporterName,
-                reporterEmail: report.reporterEmail,
-                reporterAvatar: report.reporterAvatar,
-                postId: report.postId,
-                postContent: report.postContent,
-                postIsVisible: newVisibility,
-                postCreatedAt: report.postCreatedAt,
-                reason: report.reason,
-                status: newStatus,
-                createdAt: report.createdAt,
-              );
-            }
-            return report;
-          }).toList();
-          
-          data['content'] = updatedList;
-          state = AsyncValue.data(data);
-        }
-      }
+      fetchReports(silent: true);
       _ref.invalidate(adminPostsProvider);
     } catch (e) {
       rethrow;
