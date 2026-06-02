@@ -30,11 +30,7 @@ class AdminReportsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>
     try {
       await _repository.resolveReport(id, action);
       fetchReports(silent: true);
-      try {
-        _ref.read(adminPostsProvider.notifier).loadPosts(silent: true);
-      } catch (e) {
-        // Ignore if provider is not mounted
-      }
+      _ref.invalidate(adminPostsProvider);
     } catch (e) {
       rethrow;
     }
