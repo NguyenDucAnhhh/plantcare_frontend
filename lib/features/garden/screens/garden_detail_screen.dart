@@ -262,17 +262,7 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
                           ),
                         ],
 
-                        // === Icon cham soc ===
-                        const SizedBox(height: 10),
-                        Row(
-                          children: [
-                            _careIcon(Icons.water_drop, 'Tưới nước', Colors.blue),
-                            _careIcon(Icons.compost, 'Bón phân', Colors.brown),
-                            _careIcon(Icons.shower, 'Phun sương', Colors.purple),
-                            _careIcon(Icons.rotate_right, 'Xoay cây', Colors.orange),
-                            _careIcon(Icons.content_cut, 'Cắt tỉa', Colors.teal),
-                          ],
-                        ),
+
                       ],
                     ),
                   ),
