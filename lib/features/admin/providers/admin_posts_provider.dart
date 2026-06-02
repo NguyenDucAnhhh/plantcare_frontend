@@ -41,7 +41,11 @@ class AdminPostsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
     try {
       await _dio.put('/api/admin/posts/$id/toggle-visibility');
       loadPosts(silent: true);
-      _ref.invalidate(adminReportsProvider);
+      try {
+        _ref.read(adminReportsProvider.notifier).fetchReports(silent: true);
+      } catch (e) {
+        // Ignore if provider is not mounted
+      }
       return true;
     } catch (e) {
       rethrow;
