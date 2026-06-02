@@ -5,8 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/error_mapper.dart';
-import '../../post/models/post_model.dart';
-import '../../post/widgets/post_card.dart';
+import 'package:go_router/go_router.dart';
 import '../models/admin_post_model.dart';
 import '../providers/admin_posts_provider.dart';
 import '../widgets/admin_paginated_table.dart';
@@ -147,7 +146,7 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
                   icon: const Icon(Icons.visibility_outlined, color: AppColors.primary, size: 20),
                   tooltip: 'Xem bài đăng',
                   onPressed: () {
-                    _showPostDetails(context, post);
+                    context.push('/post/${post.id}');
                   },
                 ),
                 IconButton(
@@ -174,67 +173,7 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
     );
   }
 
-  void _showPostDetails(BuildContext context, AdminPostModel post) {
-    String timeStr = 'Vừa xong';
-    try {
-      DateTime dt = DateTime.parse(post.createdAt).toLocal();
-      Duration diff = DateTime.now().difference(dt);
-      if (diff.inDays > 0) {
-        timeStr = '${diff.inDays} ngày trước';
-      } else if (diff.inHours > 0) {
-        timeStr = '${diff.inHours} giờ trước';
-      } else if (diff.inMinutes > 0) {
-        timeStr = '${diff.inMinutes} phút trước';
-      }
-    } catch (e) {
-      timeStr = post.createdAt;
-    }
 
-    final dummyPost = PostModel(
-      id: post.id.toString(),
-      content: post.content,
-      imageUrls: post.imageUrls,
-      authorId: '0',
-      authorName: post.authorName,
-      authorAvatar: 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(post.authorName)}&background=random',
-      likeCount: post.likeCount,
-      commentCount: 0,
-      timeAgo: timeStr,
-    );
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Nội dung bài đăng'),
-        content: SizedBox(
-          width: 500,
-          child: SingleChildScrollView(
-            child: Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                side: BorderSide(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: PostCard(
-                  post: dummyPost,
-                  isDetailView: true,
-                  isReadOnly: true,
-                ),
-              ),
-            ),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Đóng'),
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildStatusBadge(String text, Color color) {
     return Container(

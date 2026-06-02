@@ -5,8 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/error_mapper.dart';
-import '../../post/models/post_model.dart';
-import '../../post/widgets/post_card.dart';
+import 'package:go_router/go_router.dart';
 import '../models/admin_report_model.dart';
 import '../providers/admin_reports_provider.dart';
 import '../providers/admin_posts_provider.dart';
@@ -159,7 +158,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                   icon: const Icon(Icons.visibility_outlined, color: AppColors.primary, size: 20),
                   tooltip: 'Xem bài đăng',
                   onPressed: () {
-                    _showPostDetails(context, report);
+                    context.push('/post/${report.postId}');
                   },
                 ),
                 IconButton(
@@ -206,54 +205,6 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
     );
   }
 
-  void _showPostDetails(BuildContext context, AdminReportModel report) {
-    String timeStr = 'Vừa xong';
-    try {
-      Duration diff = DateTime.now().difference(report.postCreatedAt.toLocal());
-      if (diff.inDays > 0) {
-        timeStr = '${diff.inDays} ngày trước';
-      } else if (diff.inHours > 0) {
-        timeStr = '${diff.inHours} giờ trước';
-      } else if (diff.inMinutes > 0) {
-        timeStr = '${diff.inMinutes} phút trước';
-      }
-    } catch (e) {
-      timeStr = 'Đã đăng';
-    }
-
-    final dummyPost = PostModel(
-      id: report.postId.toString(),
-      content: report.postContent ?? '',
-      imageUrls: report.postImageUrls,
-      authorId: report.postAuthorId,
-      authorName: report.postAuthorName,
-      authorAvatar: report.postAuthorAvatar ?? 'https://ui-avatars.com/api/?name=${Uri.encodeComponent(report.postAuthorName)}&background=random',
-      likeCount: report.postLikeCount,
-      commentCount: report.postCommentCount,
-      timeAgo: timeStr,
-    );
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Chi tiết bài đăng bị tố cáo'),
-        content: SizedBox(
-          width: 500,
-          child: SingleChildScrollView(
-            child: Card(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                side: BorderSide(color: Colors.grey.shade300),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: PostCard(
-                  post: dummyPost,
-                  isDetailView: true,
-                  isReadOnly: true,
-                ),
-              ),
             ),
           ),
         ),
