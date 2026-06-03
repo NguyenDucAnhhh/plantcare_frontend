@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
-import 'package:dio/dio.dart';
+import '../../../core/network/api_client.dart';
 
 class AdminDiagnosesNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>> {
   AdminDiagnosesNotifier() : super(const AsyncValue.loading()) {
@@ -11,14 +11,12 @@ class AdminDiagnosesNotifier extends StateNotifier<AsyncValue<Map<String, dynami
   int? _rating;
   String _confidence = 'all';
   String _search = '';
-  int _page = 0;
 
   void setFilters({String? status, int? rating, String? confidence, String? search}) {
     if (status != null) _status = status;
     if (rating != null) _rating = rating == -99 ? null : rating; // -99 is our dummy value for clearing rating
     if (confidence != null) _confidence = confidence;
     if (search != null) _search = search;
-    _page = 0; // reset page on filter change
     fetchDiagnoses();
   }
 
@@ -48,23 +46,37 @@ class AdminDiagnosesNotifier extends StateNotifier<AsyncValue<Map<String, dynami
         // We will just return the whole response and let DataTableSource handle or we fetch page by page.
         state = AsyncValue.data(response.data as Map<String, dynamic>);
       }
-      _page = page;
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
   }
 
-  Future<bool> evaluateDiagnosis(int id, bool isCorrect, String note) async {
+  Future<void> evaluateDiagnosis(int id, bool isCorrect, String note) async {
     try {
       final dio = ApiClient.instance;
       await dio.patch('/api/admin/diagnoses/$id/evaluate', data: {
         'isCorrect': isCorrect,
         'adminNote': note
       });
-      fetchDiagnoses(page: _page, silent: true); // Refresh current page
-      return true;
+      
+      if (state.hasValue) {
+        final data = state.value!;
+        final content = data['content'] as List<dynamic>? ?? [];
+        final updatedList = content.map((diagDynamic) {
+          if (diagDynamic is Map<String, dynamic> && diagDynamic['id'] == id) {
+            final newDiag = Map<String, dynamic>.from(diagDynamic);
+            newDiag['status'] = 'REVIEWED';
+            newDiag['adminIsCorrect'] = isCorrect;
+            newDiag['adminNote'] = note;
+            return newDiag;
+          }
+          return diagDynamic;
+        }).toList();
+        data['content'] = updatedList;
+        state = AsyncValue.data({...data});
+      }
     } catch (e) {
-      return false;
+      rethrow;
     }
   }
 }

@@ -29,14 +29,6 @@ class GardenRepository {
   }
 
   Future<String> uploadGardenImage(String filePath) async {
-    final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(filePath),
-    });
-    final response = await _dio.post(
-      '/api/gardens/image/upload',
-      data: formData,
-      options: Options(responseType: ResponseType.plain), // Backend tra ve plain text URL, khong phai JSON
-    );
-    return response.data as String;
+    return await ApiClient.uploadImage(filePath, 'gardens');
   }
 }

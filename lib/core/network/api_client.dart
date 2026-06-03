@@ -1,4 +1,5 @@
 import 'package:dio/dio.dart';
+import 'package:image_picker/image_picker.dart';
 import '../constants/api_constants.dart';
 import '../storage/secure_storage.dart';
 
@@ -38,6 +39,59 @@ class ApiClient {
     ));
 
     return dio;
+  }
+
+  // Generic Upload Methods
+  static Future<String> uploadImage(dynamic file, String folder) async {
+    MultipartFile multipartFile;
+    if (file is String) {
+      multipartFile = await MultipartFile.fromFile(file);
+    } else if (file is XFile) {
+      final bytes = await file.readAsBytes();
+      multipartFile = MultipartFile.fromBytes(bytes, filename: file.name);
+    } else { // File from dart:io
+      multipartFile = await MultipartFile.fromFile(file.path);
+    }
+    
+    FormData formData = FormData.fromMap({
+      'file': multipartFile,
+    });
+    
+    final response = await instance.post(
+      '/api/files/upload',
+      queryParameters: {'folder': folder},
+      data: formData,
+      options: Options(responseType: ResponseType.plain),
+    );
+    return response.data as String;
+  }
+
+  static Future<List<String>> uploadMultipleImages(List<dynamic> files, String folder) async {
+    List<MultipartFile> multipartFiles = [];
+    for (var f in files) {
+      if (f is String) {
+        multipartFiles.add(await MultipartFile.fromFile(f));
+      } else if (f is XFile) {
+        final bytes = await f.readAsBytes();
+        multipartFiles.add(MultipartFile.fromBytes(bytes, filename: f.name));
+      } else {
+        multipartFiles.add(await MultipartFile.fromFile(f.path));
+      }
+    }
+    
+    FormData formData = FormData.fromMap({
+      'files': multipartFiles,
+    });
+    
+    final response = await instance.post(
+      '/api/files/upload-multiple',
+      queryParameters: {'folder': folder},
+      data: formData,
+    );
+    if (response.data != null) {
+      return List<String>.from(response.data);
+    }
+    return [];
   }
 }
 

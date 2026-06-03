@@ -54,10 +54,14 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
           TextButton(
             onPressed: () async {
               Navigator.pop(ctx);
-              final success = await ref.read(adminTipsProvider.notifier).deleteTip(id);
-              if (success && mounted) {
-                AppSnackbar.showSuccess(context, 'Đã xóa bài đăng');
-              }
+                final success = await ref.read(adminTipsProvider.notifier).deleteTip(id);
+                if (mounted) {
+                  if (success) {
+                    AppSnackbar.showSuccess(context, 'Đã xóa mẹo chăm sóc');
+                  } else {
+                    AppSnackbar.showError(context, 'Lỗi: Không thể xóa mẹo chăm sóc');
+                  }
+                }
             },
             child: const Text('Xóa', style: TextStyle(color: Colors.red)),
           ),
@@ -81,7 +85,7 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
             ElevatedButton.icon(
               onPressed: () => context.push('/admin/tips/edit'),
               icon: const Icon(Icons.add),
-              label: const Text('Thêm bài đăng'),
+              label: const Text('Thêm mẹo'),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 foregroundColor: Colors.white,

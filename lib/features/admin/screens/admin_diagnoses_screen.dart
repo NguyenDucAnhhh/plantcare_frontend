@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../providers/admin_diagnoses_provider.dart';
 import '../widgets/admin_paginated_table.dart';
 import '../widgets/admin_search_filter_bar.dart';
@@ -186,7 +188,7 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
     );
   }
 
-  void _showDetailAndEvaluateDialog(BuildContext context, WidgetRef ref, Map<String, dynamic> item) {
+  void _showDetailAndEvaluateDialog(BuildContext outerContext, WidgetRef ref, Map<String, dynamic> item) {
     final noteController = TextEditingController(text: item['adminNote'] ?? '');
     bool isCorrect = item['adminIsCorrect'] ?? true;
     final id = item['id'] as int;
@@ -199,10 +201,10 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
     }
 
     showDialog(
-      context: context,
-      builder: (context) {
+      context: outerContext,
+      builder: (dialogContext) {
         return StatefulBuilder(
-          builder: (context, setState) {
+          builder: (builderContext, setState) {
             return Dialog(
               backgroundColor: Colors.transparent,
               child: Container(
@@ -385,16 +387,25 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
                           TextButton(
-                            onPressed: () => Navigator.of(context).pop(),
+                            onPressed: () => Navigator.of(builderContext).pop(),
                             child: const Text('Hủy'),
                           ),
                           const SizedBox(width: 16),
                           FilledButton(
-                            onPressed: () async {
-                              Navigator.pop(context);
-                              await ref.read(adminDiagnosesProvider.notifier)
-                                  .evaluateDiagnosis(id, isCorrect, isCorrect ? '' : noteController.text.trim());
-                            },
+                              onPressed: () async {
+                                Navigator.pop(builderContext);
+                                try {
+                                  await ref.read(adminDiagnosesProvider.notifier)
+                                      .evaluateDiagnosis(id, isCorrect, isCorrect ? '' : noteController.text.trim());
+                                  if (mounted) {
+                                    AppSnackbar.showSuccess(outerContext, 'Lưu đánh giá thành công!');
+                                  }
+                                } catch (e) {
+                                  if (mounted) {
+                                    AppSnackbar.showError(outerContext, ErrorMapper.parseError(e));
+                                  }
+                                }
+                              },
                             child: const Text('Lưu đánh giá'),
                           ),
                         ],

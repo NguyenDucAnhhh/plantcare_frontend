@@ -37,11 +37,29 @@ class AdminTipsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>> 
   }
 
   Future<bool> deleteTip(int id) async {
-    // Delete via the user-side provider to share logic, then refresh this admin list
-    final success = await _ref.read(careTipProvider.notifier).deleteTip(id);
-    if (success) {
-      loadTips(silent: true);
+    try {
+      await _dio.delete(
+        '/api/care-tips/$id',
+        options: Options(responseType: ResponseType.plain),
+      );
+      if (state.hasValue) {
+        final data = state.value!;
+        final content = data['content'] as List<CareTipModel>? ?? [];
+        final updatedList = content.where((tip) => tip.id != id).toList();
+        data['content'] = updatedList;
+        state = AsyncValue.data({...data});
+      }
+      
+      // Also update user-side provider if mounted
+      try {
+        _ref.read(careTipProvider.notifier).loadTips();
+      } catch (e) {
+        // Ignore
+      }
+      
+      return true;
+    } catch (e) {
+      return false;
     }
-    return success;
   }
 }

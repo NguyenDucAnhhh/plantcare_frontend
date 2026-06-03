@@ -40,7 +40,29 @@ class AdminPostsNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
   Future<bool> togglePostVisibility(int id) async {
     try {
       await _dio.put('/api/admin/posts/$id/toggle-visibility');
-      loadPosts(silent: true);
+      
+      if (state.hasValue) {
+        final data = state.value!;
+        final content = data['content'] as List<AdminPostModel>? ?? [];
+        final updatedList = content.map((post) {
+          if (post.id == id) {
+            return AdminPostModel(
+              id: post.id,
+              authorName: post.authorName,
+              authorEmail: post.authorEmail,
+              content: post.content,
+              imageUrls: post.imageUrls,
+              isVisible: !post.isVisible,
+              likeCount: post.likeCount,
+              createdAt: post.createdAt,
+            );
+          }
+          return post;
+        }).toList();
+        data['content'] = updatedList;
+        state = AsyncValue.data({...data});
+      }
+
       try {
         _ref.read(adminReportsProvider.notifier).fetchReports(silent: true);
       } catch (e) {

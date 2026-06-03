@@ -37,14 +37,6 @@ class PlantRepository {
   }
 
   Future<String> uploadPlantImage(String filePath) async {
-    final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(filePath),
-    });
-    final response = await _dio.post(
-      '/api/plants/image/upload',
-      data: formData,
-      options: Options(responseType: ResponseType.plain),
-    );
-    return response.data as String;
+    return await ApiClient.uploadImage(filePath, 'plants');
   }
 }

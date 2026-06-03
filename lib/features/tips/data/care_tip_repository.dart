@@ -34,22 +34,7 @@ class CareTipRepository {
 
   Future<String?> uploadImage(XFile file) async {
     try {
-      final bytes = await file.readAsBytes();
-      final multipartFile = MultipartFile.fromBytes(bytes, filename: file.name);
-      
-      FormData formData = FormData.fromMap({
-        'files': [multipartFile],
-      });
-
-      final response = await _dio.post(
-        '/api/posts/images/upload',
-        data: formData,
-      );
-
-      if (response.data != null && (response.data as List).isNotEmpty) {
-        return (response.data as List)[0].toString();
-      }
-      return null;
+      return await ApiClient.uploadImage(file, 'tips');
     } catch (e) {
       throw Exception('Lỗi upload ảnh: $e');
     }

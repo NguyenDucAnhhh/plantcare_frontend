@@ -13,6 +13,7 @@ import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/error_mapper.dart';
 import '../../tips/providers/care_tip_provider.dart';
 import '../../tips/data/care_tip_model.dart';
+import '../providers/admin_tips_provider.dart';
 
 class AdminTipEditorScreen extends ConsumerStatefulWidget {
   final CareTipModel? initialTip;
@@ -85,7 +86,7 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
 
   Future<void> _saveTip() async {
     if (_titleController.text.trim().isEmpty) {
-      AppSnackbar.showError(context, 'Vui lòng nhập tiêu đề bài đăng');
+      AppSnackbar.showError(context, 'Vui lòng nhập tiêu đề mẹo!');
       return;
     }
 
@@ -107,6 +108,13 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
       } else {
         await ref.read(careTipProvider.notifier)
             .createTip(data, imageFile: _coverImageFile);
+      }
+
+      // Refresh admin list to show new data immediately when popping
+      try {
+        await ref.read(adminTipsProvider.notifier).loadTips(silent: true);
+      } catch (e) {
+        // ignore
       }
 
       setState(() => _isSaving = false);
@@ -135,7 +143,7 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          widget.initialTip != null ? 'Chỉnh sửa bài đăng' : 'Bài đăng mới',
+          widget.initialTip != null ? 'Chỉnh sửa mẹo' : 'Mẹo mới',
           style: AppTextStyles.body.copyWith(color: Colors.black54),
         ),
         centerTitle: true,
@@ -232,7 +240,7 @@ class _AdminTipEditorScreenState extends ConsumerState<AdminTipEditorScreen> {
                       controller: _titleController,
                       style: const TextStyle(fontSize: 40, fontWeight: FontWeight.w800, color: Colors.black87),
                       decoration: const InputDecoration(
-                        hintText: 'Tiêu đề bài đăng...',
+                        hintText: 'Tiêu đề mẹo chăm sóc...',
                         hintStyle: TextStyle(color: Colors.black26),
                         border: InputBorder.none,
                       ),

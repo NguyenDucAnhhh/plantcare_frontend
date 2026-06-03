@@ -93,25 +93,7 @@ class PostRepository {
   Future<List<String>> uploadPostImages(List<File> files) async {
     try {
       if (files.isEmpty) return [];
-      
-      List<MultipartFile> multipartFiles = [];
-      for (var file in files) {
-        multipartFiles.add(await MultipartFile.fromFile(file.path));
-      }
-
-      FormData formData = FormData.fromMap({
-        'files': multipartFiles,
-      });
-
-      final response = await _dio.post(
-        '/api/posts/images/upload',
-        data: formData,
-      );
-
-      if (response.data != null) {
-        return List<String>.from(response.data);
-      }
-      return [];
+      return await ApiClient.uploadMultipleImages(files, 'posts');
     } catch (e) {
       throw Exception('Lỗi upload ảnh: $e');
     }

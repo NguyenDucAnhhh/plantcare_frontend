@@ -32,7 +32,27 @@ class AdminUsersNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
   Future<void> toggleUserStatus(int id) async {
     try {
       await _repository.toggleUserStatus(id);
-      fetchUsers(silent: true);
+      if (state.hasValue) {
+        final data = state.value!;
+        final content = data['content'] as List<AdminUserModel>? ?? [];
+        final updatedList = content.map((user) {
+          if (user.id == id) {
+            return AdminUserModel(
+              id: user.id,
+              fullName: user.fullName,
+              email: user.email,
+              avatarUrl: user.avatarUrl,
+              role: user.role,
+              isActive: !user.isActive,
+              createdAt: user.createdAt,
+              postCount: user.postCount,
+            );
+          }
+          return user;
+        }).toList();
+        data['content'] = updatedList;
+        state = AsyncValue.data({...data}); // Force rebuild
+      }
     } catch (e) {
       rethrow;
     }
@@ -41,7 +61,27 @@ class AdminUsersNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>>
   Future<void> changeUserRole(int id, String role) async {
     try {
       await _repository.changeUserRole(id, role);
-      fetchUsers(silent: true);
+      if (state.hasValue) {
+        final data = state.value!;
+        final content = data['content'] as List<AdminUserModel>? ?? [];
+        final updatedList = content.map((user) {
+          if (user.id == id) {
+            return AdminUserModel(
+              id: user.id,
+              fullName: user.fullName,
+              email: user.email,
+              avatarUrl: user.avatarUrl,
+              role: role,
+              isActive: user.isActive,
+              createdAt: user.createdAt,
+              postCount: user.postCount,
+            );
+          }
+          return user;
+        }).toList();
+        data['content'] = updatedList;
+        state = AsyncValue.data({...data}); // Force rebuild
+      }
     } catch (e) {
       rethrow;
     }
