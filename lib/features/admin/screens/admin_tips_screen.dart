@@ -173,13 +173,19 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
                           Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              IconButton(
-                                icon: const Icon(Icons.edit_outlined, color: AppColors.primary, size: 20),
-                                onPressed: () => context.push('/admin/tips/edit', extra: tip),
+                              Tooltip(
+                                message: 'Cập nhật',
+                                child: IconButton(
+                                  icon: const Icon(Icons.edit_outlined, color: AppColors.primary, size: 20),
+                                  onPressed: () => context.push('/admin/tips/edit', extra: tip),
+                                ),
                               ),
-                              IconButton(
-                                icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
-                                onPressed: () => _showDeleteConfirm(context, ref, tip.id),
+                              Tooltip(
+                                message: 'Xoá',
+                                child: IconButton(
+                                  icon: const Icon(Icons.delete_outline, color: Colors.red, size: 20),
+                                  onPressed: () => _showDeleteConfirm(context, ref, tip.id),
+                                ),
                               ),
                             ],
                           ),
