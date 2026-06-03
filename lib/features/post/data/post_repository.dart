@@ -197,13 +197,6 @@ class PostRepository {
     }
   }
 
-  Future<void> deleteComment(String postId, String commentId) async {
-    try {
-      await _dio.delete('/api/posts/$postId/comments/$commentId');
-    } catch (e) {
-      throw Exception('Lỗi khi xóa bình luận: $e');
-    }
-  }
 
   // ====== BÁO CÁO ======
   Future<void> reportPost(String postId, String reason) async {

@@ -35,17 +35,5 @@ class CommentNotifier extends StateNotifier<AsyncValue<List<CommentModel>>> {
       throw Exception('Lỗi thêm bình luận: $e');
     }
   }
-
-  Future<void> deleteComment(String commentId) async {
-    try {
-      await _repository.deleteComment(_postId, commentId);
-      if (state.hasValue) {
-        state = AsyncValue.data(
-          state.value!.where((c) => c.id != commentId).toList(),
-        );
-      }
-    } catch (e) {
-      throw Exception('Lỗi xóa bình luận: $e');
-    }
-  }
+  
 }
