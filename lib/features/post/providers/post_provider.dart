@@ -198,6 +198,17 @@ class PostNotifier extends StateNotifier<PostState> {
     }
   }
 
+  void incrementCommentCount(String postId) {
+    state = state.copyWith(
+      posts: state.posts.map((post) {
+        if (post.id == postId) {
+          return post.copyWith(commentCount: post.commentCount + 1);
+        }
+        return post;
+      }).toList(),
+    );
+  }
+
   Future<void> reportPost(String postId, String reason) async {
     try {
       await _repository.reportPost(postId, reason);

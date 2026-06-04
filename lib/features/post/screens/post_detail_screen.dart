@@ -443,6 +443,10 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                       await ref
                           .read(commentProvider(widget.postId).notifier)
                           .addComment(content, parentId: _replyingTo?.id);
+                          
+                      // Tăng biến đếm bình luận của bài đăng trong trạng thái
+                      ref.read(postProvider.notifier).incrementCommentCount(widget.postId);
+
                       setState(() {
                         _replyingTo = null;
                       });
