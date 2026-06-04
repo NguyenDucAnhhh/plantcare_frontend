@@ -1,5 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
-import 'package:flutter/foundation.dart';
+import 'dart:ui';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -13,7 +13,7 @@ class NotificationService {
 
   Future<void> init() async {
     try {
-      NotificationSettings settings = await _messaging.requestPermission(
+      await _messaging.requestPermission(
         alert: true,
         badge: true,
         sound: true,
@@ -42,7 +42,7 @@ class NotificationService {
               AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
     } catch (e) {
-      debugPrint("Lỗi khởi tạo Local Notification: $e");
+      // Ignore
     }
 
     try {
@@ -53,16 +53,12 @@ class NotificationService {
         sound: true,
       );
     } catch (e) {
-      debugPrint("Lỗi setForegroundNotificationPresentationOptions: $e");
+      // Ignore
     }
 
-    final currentToken = await getFcmToken();
-    debugPrint("======== MÃ FCM CỦA MÁY NÀY ========");
-    debugPrint(currentToken);
-    debugPrint("====================================");
+    await getFcmToken();
 
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
-      debugPrint('Nhận được thông báo Foreground');
       
       String? title = message.notification?.title ?? message.data['title'];
       String? body = message.notification?.body ?? message.data['body'];
@@ -80,17 +76,19 @@ class NotificationService {
                 channelDescription: 'Kênh này dùng cho các thông báo quan trọng.',
                 importance: Importance.max,
                 priority: Priority.high,
+                largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
+                color: Color(0xFF4CAF50), // AppColors.primaryLight
               ),
             ),
           );
         } catch (e) {
-          debugPrint("Lỗi show notification: $e");
+          // Ignore
         }
       }
     });
 
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('Mở app từ thông báo: $message.notification?.title');
+      // Handle action if needed
     });
   }
 
@@ -98,7 +96,6 @@ class NotificationService {
     try {
       return await _messaging.getToken();
     } catch (e) {
-      debugPrint('Lỗi lấy FCM Token: $e');
       return null;
     }
   }

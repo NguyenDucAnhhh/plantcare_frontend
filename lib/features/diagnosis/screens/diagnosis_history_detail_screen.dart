@@ -163,7 +163,7 @@ class _DiagnosisHistoryDetailScreenState extends ConsumerState<DiagnosisHistoryD
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildRateBtn(Icons.thumb_up_alt_rounded, 'Chính xác', 1, Colors.green),
+                _buildRateBtn(Icons.thumb_up_alt_rounded, 'Chính xác', 1, AppColors.success),
                 const SizedBox(width: 16),
                 _buildRateBtn(Icons.thumb_down_alt_rounded, 'Không đúng', -1, Colors.red),
               ],

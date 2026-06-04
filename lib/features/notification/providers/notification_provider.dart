@@ -3,7 +3,6 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/notification_repository.dart';
 import '../models/notification_model.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class NotificationState {
   final bool isLoading;

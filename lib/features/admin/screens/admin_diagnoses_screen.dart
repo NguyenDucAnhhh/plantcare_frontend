@@ -145,7 +145,7 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
     
     final int rating = item['userFeedbackRating'] ?? 0;
     Widget ratingWidget = const Text('-');
-    if (rating == 1) ratingWidget = const Icon(Icons.thumb_up, color: Colors.green, size: 20);
+    if (rating == 1) ratingWidget = const Icon(Icons.thumb_up, color: AppColors.success, size: 20);
     if (rating == -1) ratingWidget = const Icon(Icons.thumb_down, color: Colors.red, size: 20);
 
     final bool? isCorrect = item['adminIsCorrect'];
@@ -153,7 +153,7 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
     if (isCorrect == null) {
       statusWidget = _buildStatusBadge('Chưa duyệt', Colors.orange);
     } else if (isCorrect) {
-      statusWidget = _buildStatusBadge('Chính xác', Colors.green);
+      statusWidget = _buildStatusBadge('Chính xác', AppColors.success);
     } else {
       statusWidget = _buildStatusBadge('Sai bệnh', Colors.red);
     }
@@ -347,10 +347,10 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
                         children: [
                           Expanded(
                             child: RadioListTile<bool>(
-                              title: const Text('AI chẩn đoán đúng', style: TextStyle(color: Colors.green, fontWeight: FontWeight.bold)),
+                              title: const Text('AI chẩn đoán đúng', style: TextStyle(color: AppColors.success, fontWeight: FontWeight.bold)),
                               value: true,
                               groupValue: isCorrect,
-                              activeColor: Colors.green,
+                              activeColor: AppColors.success,
                               contentPadding: EdgeInsets.zero,
                               onChanged: (val) {
                                 if (val != null) setState(() => isCorrect = val);

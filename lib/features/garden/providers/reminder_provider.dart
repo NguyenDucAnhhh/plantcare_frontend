@@ -97,32 +97,6 @@ class ReminderNotifier extends StateNotifier<ReminderState> {
     }
   }
 
-  Future<bool> toggleReminder(int reminderId) async {
-    final previousList = List<ReminderModel>.from(state.reminders);
-    final updatedList = state.reminders.map((r) {
-      if (r.id == reminderId) {
-        return ReminderModel(
-          id: r.id,
-          type: r.type,
-          triggerTime: r.triggerTime,
-          repeatDays: r.repeatDays,
-          isActive: !r.isActive,
-          plantId: r.plantId,
-        );
-      }
-      return r;
-    }).toList();
-    state = state.copyWith(reminders: updatedList, clearError: true);
-
-    try {
-      await _repository.toggleReminder(reminderId);
-      return true;
-    } catch (e) {
-      state = state.copyWith(reminders: previousList, error: 'Lỗi khi thay đổi trạng thái');
-      return false;
-    }
-  }
-
   Future<bool> deleteReminder(int reminderId) async {
     final previousList = List<ReminderModel>.from(state.reminders);
     final updatedList = state.reminders.where((r) => r.id != reminderId).toList();

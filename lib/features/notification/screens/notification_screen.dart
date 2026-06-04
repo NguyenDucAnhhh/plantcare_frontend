@@ -39,7 +39,6 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
           if (state.unreadCount > 0)
             Center(
               child: Container(
-                margin: const EdgeInsets.only(right: 16),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
                   color: AppColors.error,
@@ -54,7 +53,16 @@ class _NotificationScreenState extends ConsumerState<NotificationScreen> {
                   ),
                 ),
               ),
-            )
+            ),
+          if (state.unreadCount > 0)
+            IconButton(
+              icon: const Icon(Icons.mark_email_read, color: Colors.white),
+              tooltip: 'Đánh dấu tất cả đã đọc',
+              onPressed: () {
+                ref.read(notificationProvider.notifier).markAllAsRead();
+              },
+            ),
+          const SizedBox(width: 8),
         ],
       ),
       body: Column(
@@ -133,8 +141,8 @@ class NotificationCard extends ConsumerWidget {
       iconWidget = const Icon(Icons.chat_bubble_outline, color: Colors.blue);
       iconColor = Colors.blue.withValues(alpha: 0.1);
     } else if (notification.type == 'COMMUNITY' && (lowerTitle.contains('theo dõi') || lowerTitle.contains('follower'))) {
-      iconWidget = const Icon(Icons.person_add_alt_1_outlined, color: Colors.green);
-      iconColor = Colors.green.withValues(alpha: 0.1);
+      iconWidget = const Icon(Icons.person_add_alt_1_outlined, color: AppColors.success);
+      iconColor = AppColors.success.withValues(alpha: 0.1);
     } else if (notification.type == 'REMINDER') {
       iconWidget = const Icon(Icons.alarm, color: Colors.orange);
       iconColor = Colors.orange.withValues(alpha: 0.1);

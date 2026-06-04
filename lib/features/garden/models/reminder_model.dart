@@ -3,7 +3,6 @@ class ReminderModel {
   final String type;
   final String triggerTime;
   final String repeatDays;
-  final bool isActive;
   final int plantId;
   final String? lastPerformed;
   final String? nextExecution;
@@ -13,7 +12,6 @@ class ReminderModel {
     required this.type,
     required this.triggerTime,
     required this.repeatDays,
-    required this.isActive,
     required this.plantId,
     this.lastPerformed,
     this.nextExecution,
@@ -25,7 +23,6 @@ class ReminderModel {
       type: json['type'] ?? '',
       triggerTime: json['triggerTime'] ?? '',
       repeatDays: json['repeatDays'] ?? '',
-      isActive: json['isActive'] ?? json['active'] ?? true,
       plantId: json['plantId'] is int ? json['plantId'] : int.tryParse(json['plantId'].toString()) ?? 0,
       lastPerformed: json['lastPerformed'],
       nextExecution: json['nextExecution'],
@@ -38,7 +35,6 @@ class ReminderModel {
       'type': type,
       'triggerTime': triggerTime,
       'repeatDays': repeatDays,
-      'isActive': isActive,
       'plantId': plantId,
       'lastPerformed': lastPerformed,
       'nextExecution': nextExecution,

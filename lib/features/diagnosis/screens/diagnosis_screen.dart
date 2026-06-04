@@ -3,17 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:dio/dio.dart';
+
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/widgets/app_button.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/error_mapper.dart';
-import '../../../core/network/api_client.dart';
+
 import '../../../core/widgets/custom_header.dart';
-// import '../providers/diagnosis_provider.dart';
+import '../data/diagnosis_repository.dart';
 import '../providers/diagnosis_history_provider.dart';
-// import '../models/diagnosis_result_model.dart';
 
 class DiagnosisScreen extends ConsumerStatefulWidget {
   const DiagnosisScreen({super.key});
@@ -45,13 +43,10 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
     });
 
     try {
-      final dio = ApiClient.instance;
-      final formData = FormData.fromMap({
-        'file': await MultipartFile.fromFile(image.path, filename: image.name),
-      });
-      final response = await dio.post('/api/diagnosis/analyze', data: formData);
+      final repository = ref.read(diagnosisRepositoryProvider);
+      final data = await repository.analyzeDiagnosis(image);
       setState(() {
-        _result = response.data;
+        _result = data;
         _isAnalyzing = false;
       });
     } catch (e) {
@@ -361,7 +356,7 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    _buildRateBtn(Icons.thumb_up_alt_rounded, 'Chính xác', 1, Colors.green),
+                    _buildRateBtn(Icons.thumb_up_alt_rounded, 'Chính xác', 1, AppColors.success),
                     const SizedBox(width: 16),
                     _buildRateBtn(Icons.thumb_down_alt_rounded, 'Không đúng', -1, Colors.red),
                   ],

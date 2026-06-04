@@ -230,7 +230,7 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
               color: Colors.grey.shade200,
               child: plant.imageUrl != null
                   ? Image.network(plant.imageUrl!, fit: BoxFit.cover,
-                      errorBuilder: (_, __, ___) => const Icon(Icons.local_florist, size: 50, color: Colors.grey))
+                      errorBuilder: (_, _, _) => const Icon(Icons.local_florist, size: 50, color: Colors.grey))
                   : const Icon(Icons.local_florist, size: 50, color: Colors.grey),
             ),
 
@@ -285,16 +285,6 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _careIcon(IconData icon, String tooltip, Color color) {
-    return Tooltip(
-      message: tooltip,
-      child: Padding(
-        padding: const EdgeInsets.only(right: 10),
-        child: Icon(icon, size: 22, color: color),
       ),
     );
   }

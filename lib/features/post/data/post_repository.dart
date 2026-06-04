@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
 import '../models/post_model.dart';
 import '../models/comment_model.dart';
+import '../../../core/constants/api_constants.dart';
 
 final postRepositoryProvider = Provider<PostRepository>((ref) {
   return PostRepository();
@@ -18,7 +19,7 @@ class PostRepository {
   Future<List<PostModel>> getAllVisiblePosts({int page = 0, int size = 5}) async {
     try {
       final response = await _dio.get(
-        '/api/posts',
+        ApiConstants.posts,
         queryParameters: {
           'page': page,
           'size': size,
@@ -42,7 +43,7 @@ class PostRepository {
   // Lấy danh sách bài đăng của mình
   Future<List<PostModel>> getMyPosts() async {
     try {
-      final response = await _dio.get('/api/posts/me');
+      final response = await _dio.get(ApiConstants.myPosts,);
       if (response.data != null) {
         final List<dynamic> data = response.data;
         return data.map((json) => PostModel.fromJson(json)).toList();
@@ -56,7 +57,7 @@ class PostRepository {
   // Lấy danh sách bài đăng của những người mình đang theo dõi
   Future<List<PostModel>> getFollowingPosts({int page = 0, int size = 5}) async {
     try {
-      final response = await _dio.get('/api/posts/following', queryParameters: {
+      final response = await _dio.get('${ApiConstants.posts}/following', queryParameters: {
         'page': page,
         'size': size,
       });
@@ -71,7 +72,7 @@ class PostRepository {
   Future<List<PostModel>> searchPosts(String keyword, {int page = 0, int size = 20}) async {
     try {
       final response = await _dio.get(
-        '/api/posts/search',
+        ApiConstants.searchPosts,
         queryParameters: {
           'keyword': keyword,
           'page': page,
@@ -102,7 +103,7 @@ class PostRepository {
   // Lấy 1 bài đăng theo ID
   Future<PostModel> getPostById(String postId) async {
     try {
-      final response = await _dio.get('/api/posts/$postId');
+      final response = await _dio.get('${ApiConstants.posts}/$postId');
       if (response.data != null) {
         return PostModel.fromJson(response.data);
       }
@@ -116,7 +117,7 @@ class PostRepository {
   Future<PostModel> createPost({required String content, List<String> imageUrls = const []}) async {
     try {
       final response = await _dio.post(
-        '/api/posts',
+        ApiConstants.posts,
         data: {
           'content': content,
           'imageUrls': imageUrls,
@@ -132,7 +133,7 @@ class PostRepository {
   Future<PostModel> updatePost(String postId, {required String content, List<String> imageUrls = const []}) async {
     try {
       final response = await _dio.put(
-        '/api/posts/$postId',
+        '${ApiConstants.posts}/$postId',
         data: {
           'content': content,
           'imageUrls': imageUrls,
@@ -148,7 +149,7 @@ class PostRepository {
   Future<void> deletePost(String postId) async {
     try {
       await _dio.delete(
-        '/api/posts/$postId',
+        '${ApiConstants.posts}/$postId',
         options: Options(responseType: ResponseType.plain),
       );
     } catch (e) {
@@ -160,7 +161,7 @@ class PostRepository {
   Future<void> toggleLike(String postId) async {
     try {
       await _dio.post(
-        '/api/posts/$postId/like',
+        '${ApiConstants.posts}/$postId/like',
         options: Options(responseType: ResponseType.plain),
       );
     } catch (e) {
@@ -171,7 +172,7 @@ class PostRepository {
   // ====== BÌNH LUẬN ======
   Future<List<CommentModel>> getCommentsByPost(String postId) async {
     try {
-      final response = await _dio.get('/api/posts/$postId/comments');
+      final response = await _dio.get('${ApiConstants.posts}/$postId/comments');
       if (response.data != null) {
         final List<dynamic> data = response.data;
         return data.map((json) => CommentModel.fromJson(json, postId)).toList();
@@ -185,7 +186,7 @@ class PostRepository {
   Future<CommentModel> addComment(String postId, String content, {String? parentCommentId}) async {
     try {
       final response = await _dio.post(
-        '/api/posts/$postId/comments',
+        '${ApiConstants.posts}/$postId/comments',
         data: {
           'content': content,
           'parentCommentId': parentCommentId != null ? int.parse(parentCommentId) : null,
@@ -202,7 +203,7 @@ class PostRepository {
   Future<void> reportPost(String postId, String reason) async {
     try {
       await _dio.post(
-        '/api/reports',
+        ApiConstants.reports,
         data: {
           'postId': int.parse(postId),
           'reason': reason,

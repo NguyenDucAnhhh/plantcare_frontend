@@ -58,7 +58,7 @@ class ApiClient {
     });
     
     final response = await instance.post(
-      '/api/files/upload',
+      ApiConstants.uploadFile,
       queryParameters: {'folder': folder},
       data: formData,
       options: Options(responseType: ResponseType.plain),
@@ -84,7 +84,7 @@ class ApiClient {
     });
     
     final response = await instance.post(
-      '/api/files/upload-multiple',
+      ApiConstants.uploadMultipleFiles,
       queryParameters: {'folder': folder},
       data: formData,
     );

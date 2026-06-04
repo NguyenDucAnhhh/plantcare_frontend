@@ -1,16 +1,6 @@
-import 'package:flutter/foundation.dart' show kIsWeb;
 
 class ApiConstants {
   ApiConstants._();
-
-  // Tu dong chon URL dung theo nen tang
-  // kIsWeb          -> Chrome     -> localhost:8080
-  // Android Emulator -> 192.168.0.193:8080 
-  // Dien thoai that -> 192.168.0.193:8080 (IP Wifi cua may tinh)
-  //
-  // De test tren dien thoai that, chay:
-  //   flutter run --dart-define=PHONE_IP=192.168.x.x
-  // static const String _phoneIp = String.fromEnvironment('PHONE_IP', defaultValue: '192.168.0.193');
 
   static String get baseUrl {
     // Đã trỏ thẳng lên máy chủ thật!
@@ -20,11 +10,18 @@ class ApiConstants {
   // === AUTH ===
   static const String register = '/api/auth/register';
   static const String login = '/api/auth/login';
+  static const String forgotPassword = '/api/auth/forgot-password';
+  static const String verifyOtp = '/api/auth/verify-otp';
+  static const String resetPassword = '/api/auth/reset-password';
 
   // === USER ===
   static const String myProfile = '/api/users/me';
   static const String userProfile = '/api/users'; // + /{id}
-  static const String updateAvatar = '/api/users/me/avatar';
+  static const String searchUsers = '/api/users/search';
+  static const String updateAvatar = '/api/users/me/avatar/upload';
+  static const String changePassword = '/api/users/me/change-password';
+  static const String notificationSettings = '/api/users/me/notification-settings';
+  static const String updateFcmToken = '/api/users/fcm-token';
   static const String followUser = '/api/users'; // + /{id}/follow
   static const String myFollowings = '/api/users/me/following';
 
@@ -41,6 +38,9 @@ class ApiConstants {
 
   // === POST ===
   static const String posts = '/api/posts';
+  static const String myPosts = '/api/posts/me';
+  static const String userPosts = '/api/posts/user'; // + /{userId}
+  static const String searchPosts = '/api/posts/search';
 
   // === COMMENT ===
   static const String commentsOfPost = '/api/posts'; // + /{id}/comments
@@ -63,4 +63,8 @@ class ApiConstants {
 
   // === REPORT ===
   static const String reports = '/api/reports';
+
+  // === FILE UPLOAD ===
+  static const String uploadFile = '/api/files/upload';
+  static const String uploadMultipleFiles = '/api/files/upload-multiple';
 }

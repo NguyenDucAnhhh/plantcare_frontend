@@ -25,7 +25,7 @@ class AuthRepository{
     final authResponse = AuthResponse.fromJson(response.data);
     await SecureStorage.saveToken(authResponse.token);
     await SecureStorage.saveEmail(authResponse.email);
-    await SecureStorage.saveRole(authResponse.role ?? 'USER');
+    await SecureStorage.saveRole(authResponse.role);
     return authResponse;
   }
 
@@ -40,7 +40,7 @@ class AuthRepository{
     final authResponse = AuthResponse.fromJson(response.data);
     await SecureStorage.saveToken(authResponse.token);
     await SecureStorage.saveEmail(authResponse.email);
-    await SecureStorage.saveRole(authResponse.role ?? 'USER');
+    await SecureStorage.saveRole(authResponse.role);
     return authResponse;
   }
 
@@ -53,25 +53,25 @@ class AuthRepository{
   Future<void> updateFcmToken(String fcmToken) async {
     try {
       await _dio.put(
-        '/api/users/fcm-token',
+        ApiConstants.updateFcmToken,
         data: {'fcmToken': fcmToken},
       );
     } catch (e) {
-      print('Loi gui FCM Token: $e');
+      // Không ném lỗi ra ngoài để tránh crash app nếu FCM lỗi
     }
   }
 
   /// QUEN MAT KHAU
   Future<void> forgotPassword(String email) async {
-    await _dio.post('/api/auth/forgot-password', data: {'email': email});
+    await _dio.post(ApiConstants.forgotPassword, data: {'email': email});
   }
 
   Future<void> verifyOtp(String email, String otp) async {
-    await _dio.post('/api/auth/verify-otp', data: {'email': email, 'otp': otp});
+    await _dio.post(ApiConstants.verifyOtp, data: {'email': email, 'otp': otp});
   }
 
   Future<void> resetPassword(String email, String otp, String newPassword) async {
-    await _dio.post('/api/auth/reset-password', data: {
+    await _dio.post(ApiConstants.resetPassword, data: {
       'email': email,
       'otp': otp,
       'newPassword': newPassword,

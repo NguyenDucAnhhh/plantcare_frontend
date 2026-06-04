@@ -64,7 +64,7 @@ class TipDetailScreen extends StatelessWidget {
                     ? Image.network(
                         tip.imageUrl!,
                         fit: BoxFit.cover,
-                        errorBuilder: (_, __, ___) => _buildPlaceholder(),
+                        errorBuilder: (_, _, _) => _buildPlaceholder(),
                       )
                     : _buildPlaceholder(),
               ),

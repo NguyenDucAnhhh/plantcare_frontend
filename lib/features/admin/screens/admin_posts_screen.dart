@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
@@ -118,7 +117,7 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
     if (dateStr.length > 10) dateStr = dateStr.substring(0, 10);
     
     Widget statusWidget = post.isVisible
-        ? _buildStatusBadge('Đang hiển thị', Colors.green)
+        ? _buildStatusBadge('Đang hiển thị', AppColors.success)
         : _buildStatusBadge('Đã ẩn', Colors.red);
 
     return DataRow(
@@ -150,7 +149,7 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(post.isVisible ? Icons.visibility_off_outlined : Icons.restore, color: post.isVisible ? Colors.orange : Colors.green, size: 20),
+                  icon: Icon(post.isVisible ? Icons.visibility_off_outlined : Icons.restore, color: post.isVisible ? Colors.orange : AppColors.success, size: 20),
                   tooltip: post.isVisible ? 'Ẩn bài đăng' : 'Hoàn tác ẩn',
                   onPressed: () async {
                     try {

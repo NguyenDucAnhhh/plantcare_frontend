@@ -65,7 +65,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
         true, // notifySystem
       );
     } catch (e) {
-      debugPrint('Loi luu settings len backend: $e');
+      // Ignore
     }
   }
 
@@ -341,7 +341,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       subtitle: Text(subtitle, style: AppTextStyles.bodyGrey.copyWith(fontSize: 12)),
       value: value,
       onChanged: onChanged,
-      activeColor: Colors.white,
+      activeThumbColor: Colors.white,
       activeTrackColor: AppColors.textDark,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     );

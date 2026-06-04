@@ -83,7 +83,7 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen> {
                   ? Image.network(
                       _currentPlant.imageUrl!,
                       fit: BoxFit.contain,
-                      errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                      errorBuilder: (_, _, _) => _buildPlaceholderImage(),
                     )
                   : _buildPlaceholderImage(),
             ),

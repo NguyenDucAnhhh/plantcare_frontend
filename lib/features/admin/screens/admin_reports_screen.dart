@@ -121,7 +121,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
     Widget statusWidget;
     switch(report.status) {
       case 'KEPT':
-        statusWidget = _buildStatusBadge('Đã bỏ qua', Colors.green);
+        statusWidget = _buildStatusBadge('Đã bỏ qua', AppColors.success);
         break;
       case 'DELETED':
         statusWidget = _buildStatusBadge('Đã ẩn', Colors.red);
@@ -164,7 +164,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                 IconButton(
                   icon: Icon(
                     Icons.check_circle_outline, 
-                    color: report.status == 'KEPT' ? Colors.grey : Colors.green,
+                    color: report.status == 'KEPT' ? Colors.grey : AppColors.success,
                     size: 20,
                   ),
                   tooltip: 'Bỏ qua (Giữ bài)',
@@ -182,7 +182,7 @@ class _AdminReportsScreenState extends ConsumerState<AdminReportsScreen> {
                   },
                 ),
                 IconButton(
-                  icon: Icon(report.postIsVisible ? Icons.visibility_off_outlined : Icons.restore, color: report.postIsVisible ? Colors.orange : Colors.green, size: 20),
+                  icon: Icon(report.postIsVisible ? Icons.visibility_off_outlined : Icons.restore, color: report.postIsVisible ? Colors.orange : AppColors.success, size: 20),
                   tooltip: report.postIsVisible ? 'Ẩn bài đăng' : 'Hoàn tác ẩn',
                   onPressed: () async {
                     try {

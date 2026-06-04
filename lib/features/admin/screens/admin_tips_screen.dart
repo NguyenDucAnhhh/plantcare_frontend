@@ -153,7 +153,7 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
                           ClipRRect(
                             borderRadius: BorderRadius.circular(4),
                             child: tip.imageUrl != null && tip.imageUrl!.isNotEmpty
-                                ? Image.network(tip.imageUrl!, width: 40, height: 40, fit: BoxFit.cover, errorBuilder: (_,__,___) => const Icon(Icons.image, color: Colors.grey))
+                                ? Image.network(tip.imageUrl!, width: 40, height: 40, fit: BoxFit.cover, errorBuilder: (_,_,_) => const Icon(Icons.image, color: Colors.grey))
                                 : Container(width: 40, height: 40, color: Colors.grey.shade200, child: const Icon(Icons.article, color: Colors.grey)),
                           ),
                         ),

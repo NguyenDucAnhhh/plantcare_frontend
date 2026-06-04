@@ -66,9 +66,9 @@ class AdminLayoutShell extends ConsumerWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: AppColors.primaryLight.withOpacity(0.15),
-                    borderRadius: BorderRadius.circular(10),
+                  decoration: const BoxDecoration(
+                    color: AppColors.primaryBg,
+                    shape: BoxShape.circle,
                   ),
                   child: const Icon(Icons.eco_rounded,
                       color: AppColors.primaryLight, size: 22),

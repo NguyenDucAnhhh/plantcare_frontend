@@ -143,14 +143,14 @@ class AdminUsersScreen extends ConsumerWidget {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
                 decoration: BoxDecoration(
-                  color: isLocked ? Colors.red.withValues(alpha: 0.1) : Colors.green.withValues(alpha: 0.1),
+                  color: isLocked ? Colors.red.withValues(alpha: 0.1) : AppColors.success.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Text(
                   isLocked ? 'Đã khóa' : 'Hoạt động',
                   style: AppTextStyles.body.copyWith(
                     fontSize: 12,
-                    color: isLocked ? Colors.red : Colors.green,
+                    color: isLocked ? Colors.red : AppColors.success,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -192,7 +192,7 @@ class AdminUsersScreen extends ConsumerWidget {
                 IconButton(
                   icon: Icon(
                     isLocked ? Icons.lock_open : Icons.lock_outline, 
-                    color: isLocked ? Colors.green : Colors.red, 
+                    color: isLocked ? AppColors.success : Colors.red, 
                     size: 20
                   ),
                   tooltip: isLocked ? 'Mở khóa tài khoản' : 'Khóa tài khoản',

@@ -23,7 +23,7 @@ class PostFormBottomSheet extends ConsumerStatefulWidget {
 class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
   late TextEditingController _contentController;
   final ImagePicker _picker = ImagePicker();
-  List<File> _selectedImages = [];
+  final List<File> _selectedImages = [];
   List<String> _existingImageUrls = [];
   bool _isLoading = false;
 
@@ -64,7 +64,7 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
         });
       }
     } catch (e) {
-      debugPrint('Error picking images: $e');
+      // Ignore
     }
   }
 

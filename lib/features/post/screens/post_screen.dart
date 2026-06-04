@@ -174,40 +174,4 @@ class _PostScreenState extends ConsumerState<PostScreen> {
     );
   }
 
-  Widget _buildTab(int index, String title) {
-    final isSelected = _selectedTabIndex == index;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () {
-          if (_selectedTabIndex != index) {
-            setState(() => _selectedTabIndex = index);
-            ref.read(postProvider.notifier).loadPosts(isFollowing: index == 1);
-          }
-        },
-        child: Container(
-          decoration: BoxDecoration(
-            color: isSelected ? Colors.white : Colors.transparent,
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: isSelected
-                ? [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
-              )
-            ]
-                : [],
-          ),
-          alignment: Alignment.center,
-          child: Text(
-            title,
-            style: AppTextStyles.body.copyWith(
-              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
-              color: isSelected ? AppColors.textDark : AppColors.textGrey,
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }

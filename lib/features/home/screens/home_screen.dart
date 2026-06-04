@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
-import '../../../core/storage/secure_storage.dart';
 import '../providers/weather_provider.dart';
 import '../data/weather_model.dart';
 import '../../notification/providers/notification_provider.dart';
@@ -24,7 +23,7 @@ class HomeScreen extends ConsumerWidget {
         color: AppColors.primary,
         onRefresh: () async {
           // Tải lại dữ liệu thời tiết
-          ref.refresh(weatherProvider);
+          ref.invalidate(weatherProvider);
           // Đợi 1 chút để UI có cảm giác đang tải
           await Future.delayed(const Duration(milliseconds: 500));
         },
@@ -81,10 +80,10 @@ class HomeScreen extends ConsumerWidget {
                   Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.2),
-                      borderRadius: BorderRadius.circular(12),
+                      color: AppColors.primaryBg,
+                      shape: BoxShape.circle,
                     ),
-                    child: const Icon(Icons.eco_rounded, color: Colors.white, size: 24),
+                    child: const Icon(Icons.eco_rounded, color: AppColors.primaryLight, size: 24),
                   ),
                   const SizedBox(width: 12),
                   Text(
@@ -143,7 +142,7 @@ class HomeScreen extends ConsumerWidget {
               // === DONG 2: WEATHER CARD ===
               weatherAsync.when(
                 loading: () => _buildWeatherCard(WeatherModel.mock(), isLoading: true),
-                error: (_, __) => _buildWeatherCard(WeatherModel.mock()),
+                error: (_, _) => _buildWeatherCard(WeatherModel.mock()),
                 data: (weather) => _buildWeatherCard(weather),
               ),
             ],

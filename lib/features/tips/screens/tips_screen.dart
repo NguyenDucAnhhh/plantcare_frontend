@@ -166,7 +166,7 @@ class _TipsScreenState extends ConsumerState<TipsScreen> {
                                             height: 160,
                                             width: double.infinity,
                                             fit: BoxFit.cover,
-                                            errorBuilder: (_, __, ___) => _buildPlaceholderImage(),
+                                            errorBuilder: (_, _, _) => _buildPlaceholderImage(),
                                           ),
                                         )
                                       else

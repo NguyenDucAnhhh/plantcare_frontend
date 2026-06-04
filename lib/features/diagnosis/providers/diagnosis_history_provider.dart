@@ -1,17 +1,18 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/network/api_client.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../data/diagnosis_repository.dart';
 
 class DiagnosisHistoryNotifier extends StateNotifier<AsyncValue<List<dynamic>>> {
-  DiagnosisHistoryNotifier() : super(const AsyncValue.loading()) {
+  final DiagnosisRepository _repository;
+
+  DiagnosisHistoryNotifier(this._repository) : super(const AsyncValue.loading()) {
     fetchHistory();
   }
 
   Future<void> fetchHistory() async {
     try {
       state = const AsyncValue.loading();
-      final dio = ApiClient.instance;
-      final response = await dio.get('/api/diagnosis/history');
-      state = AsyncValue.data(response.data as List<dynamic>);
+      final data = await _repository.getDiagnosisHistory();
+      state = AsyncValue.data(data);
     } catch (e, stack) {
       state = AsyncValue.error(e, stack);
     }
@@ -19,8 +20,7 @@ class DiagnosisHistoryNotifier extends StateNotifier<AsyncValue<List<dynamic>>> 
 
   Future<bool> rateDiagnosis(int id, int rating) async {
     try {
-      final dio = ApiClient.instance;
-      await dio.post('/api/diagnosis/$id/rate', data: {'rating': rating});
+      await _repository.rateDiagnosis(id, rating);
       fetchHistory(); // Refresh
       return true;
     } catch (e) {
@@ -30,5 +30,6 @@ class DiagnosisHistoryNotifier extends StateNotifier<AsyncValue<List<dynamic>>> 
 }
 
 final diagnosisHistoryProvider = StateNotifierProvider<DiagnosisHistoryNotifier, AsyncValue<List<dynamic>>>((ref) {
-  return DiagnosisHistoryNotifier();
+  final repository = ref.watch(diagnosisRepositoryProvider);
+  return DiagnosisHistoryNotifier(repository);
 });

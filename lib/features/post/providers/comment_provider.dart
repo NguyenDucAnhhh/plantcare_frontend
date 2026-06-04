@@ -35,5 +35,5 @@ class CommentNotifier extends StateNotifier<AsyncValue<List<CommentModel>>> {
       throw Exception('Lỗi thêm bình luận: $e');
     }
   }
-  
+
 }

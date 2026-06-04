@@ -1,6 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
-import '../../../core/network/api_client.dart';
 
 class AdminDiagnosesNotifier extends StateNotifier<AsyncValue<Map<String, dynamic>>> {
   AdminDiagnosesNotifier() : super(const AsyncValue.loading()) {

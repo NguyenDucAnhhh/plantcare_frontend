@@ -30,7 +30,7 @@ class WeatherModel {
   // Du lieu gia lap khi chua co API Key
   factory WeatherModel.mock() {
     return const WeatherModel(
-      temperature: 28,
+      temperature: 37,
       description: 'Trời nắng',
       city: 'Hà Nội',
       humidity: 65,

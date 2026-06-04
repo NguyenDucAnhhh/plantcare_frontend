@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../models/plant_model.dart';
 import '../models/garden_model.dart';
 import '../providers/plant_provider.dart';
+import '../providers/reminder_provider.dart';
 
 class MoveTreeDialog extends ConsumerStatefulWidget {
   final PlantModel plant;
@@ -93,6 +93,8 @@ class _MoveTreeDialogState extends ConsumerState<MoveTreeDialog> {
                             .read(plantProvider(widget.plant.gardenId).notifier)
                             .movePlant(widget.plant.id, _selectedGardenId!);
                         if (success && context.mounted) {
+                          ref.invalidate(reminderProvider(widget.plant.gardenId));
+                          ref.invalidate(reminderProvider(_selectedGardenId!));
                           Navigator.pop(context);
                           AppSnackbar.showSuccess(context, 'Chuyển cây thành công!');
                         }

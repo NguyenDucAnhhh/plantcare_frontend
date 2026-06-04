@@ -1,7 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../../core/storage/secure_storage.dart';
 import '../../../core/utils/error_mapper.dart';
 import '../data/auth_repository.dart';
 import '../models/auth_response.dart';
@@ -54,7 +53,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
           await _repository.updateFcmToken(token);
         }
       } catch (e) {
-        print("Loi update FCM: $e");
+        // Ignore
       }
 
       state = state.copyWith(isLoading: false, user: user);

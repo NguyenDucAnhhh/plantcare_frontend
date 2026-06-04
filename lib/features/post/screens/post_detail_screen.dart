@@ -6,7 +6,6 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
 import '../../../core/utils/error_mapper.dart';
 import '../../../core/widgets/app_avatar.dart';
-import '../../auth/providers/auth_provider.dart';
 import '../../profile/providers/profile_provider.dart';
 import '../models/post_model.dart';
 import '../models/comment_model.dart';
@@ -178,7 +177,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     // Bai dang
-                    if (post != null) PostCard(post: post, isDetailView: true),
+                    PostCard(post: post, isDetailView: true),
 
                     Divider(
                       color: Colors.grey.shade200,
@@ -214,7 +213,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
                           itemCount: topLevelComments.length,
-                          separatorBuilder: (_, __) =>
+                          separatorBuilder: (_, _) =>
                               Divider(color: Colors.grey.shade200, height: 1),
                           itemBuilder: (context, index) {
                             return _buildCommentThread(
