@@ -6,6 +6,7 @@ import '../models/plant_model.dart';
 import '../models/garden_model.dart';
 import '../providers/plant_provider.dart';
 import '../providers/reminder_provider.dart';
+import '../providers/garden_provider.dart';
 
 class MoveTreeDialog extends ConsumerStatefulWidget {
   final PlantModel plant;
@@ -93,6 +94,12 @@ class _MoveTreeDialogState extends ConsumerState<MoveTreeDialog> {
                             .read(plantProvider(widget.plant.gardenId).notifier)
                             .movePlant(widget.plant.id, _selectedGardenId!);
                         if (success && context.mounted) {
+                          // Cap nhat so luong cay o 2 vuon trong gardenProvider
+                          ref.read(gardenProvider.notifier).updatePlantCountOnMove(
+                            widget.plant.gardenId, 
+                            _selectedGardenId!
+                          );
+
                           ref.invalidate(reminderProvider(widget.plant.gardenId));
                           ref.invalidate(reminderProvider(_selectedGardenId!));
                           Navigator.pop(context);

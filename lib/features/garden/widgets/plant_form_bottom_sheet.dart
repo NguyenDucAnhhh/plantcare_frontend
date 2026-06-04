@@ -9,6 +9,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/custom_bottom_sheet_form.dart';
 import '../models/plant_model.dart';
 import '../providers/plant_provider.dart';
+import '../providers/garden_provider.dart';
 
 class PlantFormBottomSheet extends ConsumerStatefulWidget {
   final int gardenId;
@@ -116,7 +117,12 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
       );
     }
 
-    if (success && mounted) Navigator.pop(context);
+    if (success && mounted) {
+      if (widget.plant == null) {
+        ref.read(gardenProvider.notifier).updateSinglePlantCount(widget.gardenId, isIncrement: true);
+      }
+      Navigator.pop(context);
+    }
   }
 
   @override

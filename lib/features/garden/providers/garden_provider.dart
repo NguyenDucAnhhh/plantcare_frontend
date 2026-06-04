@@ -134,6 +134,33 @@ class GardenNotifier extends StateNotifier<GardenState> {
       rethrow;
     }
   }
+
+  void updatePlantCountOnMove(int fromGardenId, int toGardenId) {
+    state = state.copyWith(
+      gardens: state.gardens.map((g) {
+        if (g.id == fromGardenId) {
+          return g.copyWith(plantCount: g.plantCount - 1);
+        }
+        if (g.id == toGardenId) {
+          return g.copyWith(plantCount: g.plantCount + 1);
+        }
+        return g;
+      }).toList(),
+    );
+  }
+
+  void updateSinglePlantCount(int gardenId, {required bool isIncrement}) {
+    state = state.copyWith(
+      gardens: state.gardens.map((g) {
+        if (g.id == gardenId) {
+          return g.copyWith(
+            plantCount: isIncrement ? g.plantCount + 1 : g.plantCount - 1,
+          );
+        }
+        return g;
+      }).toList(),
+    );
+  }
 }
 
 final gardenRepositoryProvider = Provider((ref) => GardenRepository());

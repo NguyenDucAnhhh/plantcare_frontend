@@ -11,6 +11,7 @@ import '../widgets/reminder_form_bottom_sheet.dart';
 import '../widgets/plant_form_bottom_sheet.dart';
 import '../../../core/widgets/confirm_delete_dialog.dart';
 import '../providers/plant_provider.dart';
+import '../providers/garden_provider.dart';
 import '../../../core/widgets/custom_header.dart';
 import '../../../core/widgets/app_popup_menu.dart';
 
@@ -454,7 +455,10 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen> {
         title: 'Xác nhận xóa cây',
         content: 'Bạn có chắc chắn muốn xóa cây ${_currentPlant.name} không?\nHành động này không thể hoàn tác.',
         onConfirm: () async {
-          await ref.read(plantProvider(widget.garden.id).notifier).deletePlant(_currentPlant.id);
+          final success = await ref.read(plantProvider(widget.garden.id).notifier).deletePlant(_currentPlant.id);
+          if (success) {
+            ref.read(gardenProvider.notifier).updateSinglePlantCount(widget.garden.id, isIncrement: false);
+          }
           if (context.mounted) Navigator.of(context).pop();
         },
       ),

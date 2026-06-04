@@ -316,7 +316,12 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
       builder: (_) => ConfirmDeleteDialog(
         title: 'Xác nhận xóa cây',
         content: 'Bạn có chắc chắn muốn xóa cây ${plant.name} không?\nHành động này không thể hoàn tác.',
-        onConfirm: () async => ref.read(plantProvider(widget.garden.id).notifier).deletePlant(plant.id),
+        onConfirm: () async {
+          final success = await ref.read(plantProvider(widget.garden.id).notifier).deletePlant(plant.id);
+          if (success) {
+            ref.read(gardenProvider.notifier).updateSinglePlantCount(widget.garden.id, isIncrement: false);
+          }
+        },
       ),
     );
   }
