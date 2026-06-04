@@ -6,6 +6,7 @@ import '../../../core/constants/app_text_styles.dart';
 import '../providers/profile_provider.dart';
 import '../widgets/profile_header.dart';
 import '../widgets/profile_form_bottom_sheet.dart';
+import '../widgets/profile_posts_grid.dart';
 import '../../../core/utils/error_mapper.dart';
 import '../../../core/utils/app_snackbar.dart';
 
@@ -60,8 +61,7 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
     if (profileState.isLoading && profileState.profile == null) {
       return const Scaffold(
         backgroundColor: AppColors.background,
-        body: Center(
-            child: CircularProgressIndicator(color: AppColors.primary)),
+        body: Center(child: CircularProgressIndicator(color: AppColors.primary)),
       );
     }
 
@@ -75,113 +75,49 @@ class _ProfileScreenState extends ConsumerState<ProfileScreen> {
 
     return Scaffold(
       backgroundColor: AppColors.background,
-      body: Column(
-        children: [
-          ProfileHeader(
-            avatarUrl: avatarUrl,
-            localPath: localAvatarPath,
-            fullName: fullName,
-            followersCount: followers,
-            followingCount: following,
-            bio: bio,
-            rightActions: [
-              IconButton(
-                icon: const Icon(Icons.settings_outlined, color: Colors.white),
-                onPressed: () => context.push('/settings'),
-              ),
-            ],
-            actionRow: Row(
-              children: [
-                Expanded(
-                  child: ElevatedButton.icon(
-                    onPressed: _showEditProfileBottomSheet,
-                    icon: const Icon(Icons.edit_outlined, size: 18),
-                    label: const Text('Chỉnh sửa'),
-                    style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.white),
+      body: RefreshIndicator(
+        onRefresh: () => ref.read(profileProvider.notifier).loadProfileData(),
+        child: CustomScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          slivers: [
+            SliverToBoxAdapter(
+              child: ProfileHeader(
+                avatarUrl: avatarUrl,
+                localPath: localAvatarPath,
+                fullName: fullName,
+                followersCount: followers,
+                followingCount: following,
+                bio: bio,
+                rightActions: [
+                  IconButton(
+                    icon: const Icon(Icons.settings_outlined, color: Colors.white),
+                    onPressed: () => context.push('/settings'),
                   ),
-                ),
-              ],
-            ),
-          ),
-
-          // === CONTENT ===
-          Expanded(
-            child: profileState.isLoading
-                ? const Center(
-                child: CircularProgressIndicator(color: AppColors.primary))
-                : (profileState.posts.isEmpty
-                ? _buildEmptyState(
-                'Bạn chưa có bài đăng nào', Icons.article_outlined)
-                : _buildPostsGrid(profileState.posts)),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildEmptyState(String message, IconData icon) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.grey.shade100,
-              shape: BoxShape.circle,
-            ),
-            child: Icon(icon, size: 48, color: Colors.grey.shade400),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            message,
-            style: AppTextStyles.bodyGrey.copyWith(fontSize: 16),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildPostsGrid(List<dynamic> posts) {
-    return GridView.builder(
-      padding: const EdgeInsets.all(2),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        crossAxisSpacing: 2,
-        mainAxisSpacing: 2,
-      ),
-      itemCount: posts.length,
-      itemBuilder: (context, index) {
-        final post = posts[index];
-        // Lấy danh sách ảnh từ Map
-        final List<dynamic> imageUrls = post['imageUrls'] ?? [];
-        final String? firstImage = imageUrls.isNotEmpty
-            ? imageUrls[0]
-            : post['imageUrl'];
-
-        return GestureDetector(
-          // KHI NHẤN VÀO ẢNH: Chuyển sang trang chi tiết bài đăng
-          onTap: () => context.push('/post/${post['id']}'),
-          child: Container(
-            color: Colors.grey.shade200,
-            child: firstImage != null
-                ? Image.network(firstImage, fit: BoxFit.cover)
-                : Container(
-                    padding: const EdgeInsets.all(8.0),
-                    alignment: Alignment.center,
-                    color: Colors.white,
-                    child: Text(
-                      post['content'] ?? '',
-                      maxLines: 4,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(fontSize: 12, color: Colors.black87),
-                      textAlign: TextAlign.center,
+                ],
+                actionRow: Row(
+                  children: [
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: _showEditProfileBottomSheet,
+                        icon: const Icon(Icons.edit_outlined, size: 18),
+                        label: const Text('Chỉnh sửa'),
+                        style: ElevatedButton.styleFrom(backgroundColor: Colors.white),
+                      ),
                     ),
-                  ),
-          ),
-        );
-      },
+                  ],
+                ),
+              ),
+            ),
+            
+            if (profileState.isLoading)
+              const SliverFillRemaining(
+                child: Center(child: CircularProgressIndicator(color: AppColors.primary)),
+              )
+            else
+              ProfilePostsGrid(posts: profileState.posts),
+          ],
+        ),
+      ),
     );
   }
 }

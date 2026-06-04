@@ -1,11 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/profile_repository.dart';
+import '../../post/models/post_model.dart';
 
 class ProfileState {
   final bool isLoading;
   final String? error;
   final Map<String, dynamic>? profile;
-  final List<dynamic> posts;
+  final List<PostModel> posts;
 
   ProfileState({
     this.isLoading = false,
@@ -18,7 +19,7 @@ class ProfileState {
     bool? isLoading,
     String? error,
     Map<String, dynamic>? profile,
-    List<dynamic>? posts,
+    List<PostModel>? posts,
   }) {
     return ProfileState(
       isLoading: isLoading ?? this.isLoading,
@@ -44,10 +45,12 @@ class ProfileNotifier extends StateNotifier<ProfileState> {
         _repository.getMyPosts(),
       ]);
 
+      final postsData = futures[1] as List<dynamic>;
+
       state = state.copyWith(
         isLoading: false,
         profile: futures[0] as Map<String, dynamic>,
-        posts: futures[1] as List<dynamic>,
+        posts: postsData.map((p) => PostModel.fromJson(p)).toList(),
       );
     } catch (e) {
       state = state.copyWith(isLoading: false, error: e.toString());
