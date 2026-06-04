@@ -102,7 +102,7 @@ class PublicProfileNotifier extends StateNotifier<PublicProfileState> {
   }
 }
 
-final publicProfileProvider = StateNotifierProvider.family<PublicProfileNotifier, PublicProfileState, String>((ref, userId) {
+final publicProfileProvider = StateNotifierProvider.autoDispose.family<PublicProfileNotifier, PublicProfileState, String>((ref, userId) {
   final repository = ref.watch(profileRepositoryProvider);
   return PublicProfileNotifier(repository, userId);
 });
