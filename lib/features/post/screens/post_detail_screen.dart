@@ -390,7 +390,7 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             color: Colors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, -2),
               ),
@@ -451,12 +451,11 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
                         _replyingTo = null;
                       });
                     } catch (e) {
-                      if (context.mounted) {
-                        AppSnackbar.showError(
-                          context,
-                          ErrorMapper.parseError(e),
-                        );
-                      }
+                      if (!mounted) return;
+                      AppSnackbar.showError(
+                        context,
+                        ErrorMapper.parseError(e),
+                      );
                     }
                   }
                 },

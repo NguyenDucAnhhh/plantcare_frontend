@@ -61,7 +61,6 @@ class PlantCareApp extends ConsumerWidget {
         colorScheme: ColorScheme.fromSeed(
           seedColor: AppColors.primary,
           primary: AppColors.primary,
-          background: AppColors.background,
           surface: AppColors.surface,
         ),
         scaffoldBackgroundColor: AppColors.background,
