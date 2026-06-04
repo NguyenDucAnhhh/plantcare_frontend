@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
-
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
@@ -209,12 +209,19 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
           children: [
             ClipRRect(
               borderRadius: BorderRadius.circular(12),
-              child: Image.file(
-                File(_selectedImage!.path),
-                height: 220,
-                width: double.infinity,
-                fit: BoxFit.cover,
-              ),
+              child: kIsWeb
+                  ? Image.network(
+                      _selectedImage!.path,
+                      height: 220,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    )
+                  : Image.file(
+                      File(_selectedImage!.path),
+                      height: 220,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
             ),
             const SizedBox(height: 12),
             TextButton.icon(

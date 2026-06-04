@@ -91,7 +91,7 @@ class PostRepository {
 
 
   // Upload nhiều ảnh
-  Future<List<String>> uploadPostImages(List<File> files) async {
+  Future<List<String>> uploadPostImages(List<dynamic> files) async {
     try {
       if (files.isEmpty) return [];
       return await ApiClient.uploadMultipleImages(files, 'posts');

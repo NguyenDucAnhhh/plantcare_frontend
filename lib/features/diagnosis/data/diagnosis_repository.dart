@@ -19,8 +19,9 @@ class DiagnosisRepository {
   }
 
   Future<Map<String, dynamic>> analyzeDiagnosis(XFile image) async {
+    final bytes = await image.readAsBytes();
     final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(image.path, filename: image.name),
+      'file': MultipartFile.fromBytes(bytes, filename: image.name),
     });
     final response = await _dio.post('${ApiConstants.diagnosis}/analyze', data: formData);
     return response.data;

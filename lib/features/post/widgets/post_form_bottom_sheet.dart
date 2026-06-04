@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/custom_bottom_sheet_form.dart';
@@ -23,7 +24,7 @@ class PostFormBottomSheet extends ConsumerStatefulWidget {
 class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
   late TextEditingController _contentController;
   final ImagePicker _picker = ImagePicker();
-  final List<File> _selectedImages = [];
+  final List<XFile> _selectedImages = [];
   List<String> _existingImageUrls = [];
   bool _isLoading = false;
 
@@ -59,7 +60,7 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
         setState(() {
           int remainingSlots = 4 - _existingImageUrls.length - _selectedImages.length;
           for (var i = 0; i < images.length && i < remainingSlots; i++) {
-            _selectedImages.add(File(images[i].path));
+            _selectedImages.add(images[i]);
           }
         });
       }
@@ -212,12 +213,19 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
                           children: [
                             ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: Image.file(
-                                _selectedImages[index],
-                                width: 80,
-                                height: 80,
-                                fit: BoxFit.cover,
-                              ),
+                              child: kIsWeb
+                                  ? Image.network(
+                                      _selectedImages[index].path,
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      File(_selectedImages[index].path),
+                                      width: 80,
+                                      height: 80,
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                             Positioned(
                               top: -10,

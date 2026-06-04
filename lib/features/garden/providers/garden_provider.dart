@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../data/garden_repository.dart';
 import '../models/garden_model.dart';
 
@@ -48,13 +49,13 @@ class GardenNotifier extends StateNotifier<GardenState> {
     required String name,
     String? location,
     String? description,
-    String? imagePath,
+    XFile? imageFile,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       String? imageUrl;
-      if (imagePath != null) {
-        imageUrl = await _repository.uploadGardenImage(imagePath);
+      if (imageFile != null) {
+        imageUrl = await _repository.uploadGardenImage(imageFile);
       }
 
       final newGarden = GardenModel(
@@ -82,15 +83,15 @@ class GardenNotifier extends StateNotifier<GardenState> {
     required String name,
     String? location,
     String? description,
-    String? imagePath,
+    XFile? imageFile,
     String? currentImageUrl,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       String? imageUrl = currentImageUrl;
       // Neu chon anh moi tu may, thuc hien upload
-      if (imagePath != null && !imagePath.startsWith('http')) {
-        imageUrl = await _repository.uploadGardenImage(imagePath);
+      if (imageFile != null) {
+        imageUrl = await _repository.uploadGardenImage(imageFile);
       }
 
       final updatedGarden = GardenModel(

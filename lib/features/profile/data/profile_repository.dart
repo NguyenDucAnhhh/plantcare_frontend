@@ -24,12 +24,17 @@ class ProfileRepository {
     await _dio.put(ApiConstants.myProfile, data: data);
   }
 
-  Future<Map<String, dynamic>> uploadAvatar(String filePath) async {
-    final formData = FormData.fromMap({
-      'file': await MultipartFile.fromFile(filePath),
-    });
-    final response = await _dio.post(ApiConstants.updateAvatar, data: formData);
+  Future<Map<String, dynamic>> uploadAvatar(dynamic image) async {
+    final response = await _dio.post(ApiConstants.updateAvatar, data: FormData.fromMap({
+      'file': await _createMultipart(image),
+    }));
     return response.data;
+  }
+
+  Future<MultipartFile> _createMultipart(dynamic file) async {
+    if (file is String) return await MultipartFile.fromFile(file);
+    final bytes = await file.readAsBytes();
+    return MultipartFile.fromBytes(bytes, filename: file.name);
   }
 
   Future<Map<String, dynamic>> getUserProfileById(String userId) async {

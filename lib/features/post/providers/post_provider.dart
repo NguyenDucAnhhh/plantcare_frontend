@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import 'dart:io' as dart_io;
 import '../models/post_model.dart';
 import '../data/post_repository.dart';
@@ -114,7 +115,7 @@ class PostNotifier extends StateNotifier<PostState> {
     await loadPosts(isFollowing: isFollowing);
   }
 
-  Future<void> createPost(String content, {List<dart_io.File> images = const []}) async {
+  Future<void> createPost(String content, {List<XFile> images = const []}) async {
     try {
       state = state.copyWith(isLoading: true);
       List<String> imageUrls = [];
@@ -137,7 +138,7 @@ class PostNotifier extends StateNotifier<PostState> {
     }
   }
 
-  Future<void> updatePost(String postId, String content, {List<dart_io.File> newImages = const [], List<String> existingImageUrls = const []}) async {
+  Future<void> updatePost(String postId, String content, {List<XFile> newImages = const [], List<String> existingImageUrls = const []}) async {
     try {
       state = state.copyWith(isLoading: true);
       List<String> finalImageUrls = List.from(existingImageUrls);

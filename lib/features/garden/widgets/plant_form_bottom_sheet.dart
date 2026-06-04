@@ -31,7 +31,7 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
   late TextEditingController _descCtrl;
   late TextEditingController _dateCtrl;
 
-  String? _localImagePath;
+  XFile? _localImageFile;
   String? _currentImageUrl;
   DateTime? _selectedDate;
 
@@ -68,7 +68,7 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
     final picker = ImagePicker();
     final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (image != null) {
-      setState(() => _localImagePath = image.path);
+      setState(() => _localImageFile = image);
     }
   }
 
@@ -103,7 +103,7 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
         species: _speciesCtrl.text.trim(),
         description: _descCtrl.text.trim(),
         datePlanted: datePlantedIso,
-        imagePath: _localImagePath,
+        imageFile: _localImageFile,
         currentImageUrl: _currentImageUrl,
       );
     } else {
@@ -112,7 +112,7 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
         species: _speciesCtrl.text.trim(),
         description: _descCtrl.text.trim(),
         datePlanted: datePlantedIso,
-        imagePath: _localImagePath,
+        imageFile: _localImageFile,
       );
     }
 
@@ -191,7 +191,7 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
   }
 
   Widget _buildImagePicker(bool isEdit) {
-    final hasLocalImage = _localImagePath != null;
+    final hasLocalImage = _localImageFile != null;
     final hasRemoteImage = _currentImageUrl != null && _currentImageUrl!.isNotEmpty;
 
     if (hasLocalImage || hasRemoteImage) {
@@ -203,9 +203,10 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
               width: double.infinity,
               height: 180,
               child: hasLocalImage
-                  ? (kIsWeb
-                      ? Image.network(_localImagePath!, fit: BoxFit.cover)
-                      : Image.file(File(_localImagePath!), fit: BoxFit.cover))
+                  ? Image(
+                      image: kIsWeb ? NetworkImage(_localImageFile!.path) : FileImage(File(_localImageFile!.path)) as ImageProvider,
+                      fit: BoxFit.cover,
+                    )
                   : Image.network(_currentImageUrl!, fit: BoxFit.cover),
             ),
           ),
@@ -215,7 +216,7 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
             right: 8,
             child: GestureDetector(
               onTap: () => setState(() {
-                _localImagePath = null;
+                _localImageFile = null;
                 _currentImageUrl = null;
               }),
               child: Container(

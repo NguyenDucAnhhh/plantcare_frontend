@@ -37,7 +37,7 @@ class PlantRepository {
     return PlantModel.fromJson(response.data);
   }
 
-  Future<String> uploadPlantImage(String filePath) async {
-    return await ApiClient.uploadImage(filePath, 'plants');
+  Future<String> uploadPlantImage(dynamic image) async {
+    return await ApiClient.uploadImage(image, 'plants');
   }
 }

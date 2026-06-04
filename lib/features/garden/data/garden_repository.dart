@@ -29,7 +29,7 @@ class GardenRepository {
     );
   }
 
-  Future<String> uploadGardenImage(String filePath) async {
-    return await ApiClient.uploadImage(filePath, 'gardens');
+  Future<String> uploadGardenImage(dynamic image) async {
+    return await ApiClient.uploadImage(image, 'gardens');
   }
 }

@@ -22,7 +22,7 @@ class _ProfileFormBottomSheetState extends ConsumerState<ProfileFormBottomSheet>
   late TextEditingController _nameCtrl;
   late TextEditingController _bioCtrl;
   bool _isLoading = false;
-  String? _localAvatarPath;
+  XFile? _localAvatarFile;
   String? _currentAvatarUrl;
 
   @override
@@ -48,8 +48,8 @@ class _ProfileFormBottomSheetState extends ConsumerState<ProfileFormBottomSheet>
     try {
       final repo = ref.read(profileRepositoryProvider);
       
-      if (_localAvatarPath != null && !kIsWeb) {
-        await repo.uploadAvatar(_localAvatarPath!);
+      if (_localAvatarFile != null) {
+        await repo.uploadAvatar(_localAvatarFile!);
       }
 
       await ref.read(profileProvider.notifier).updateProfile({
@@ -89,7 +89,7 @@ class _ProfileFormBottomSheetState extends ConsumerState<ProfileFormBottomSheet>
               children: [
                 AppAvatar(
                   imageUrl: _currentAvatarUrl,
-                  localPath: _localAvatarPath,
+                  localPath: _localAvatarFile?.path,
                   radius: 40,
                 ),
                 const SizedBox(width: 16),
@@ -102,7 +102,7 @@ class _ProfileFormBottomSheetState extends ConsumerState<ProfileFormBottomSheet>
                         final image = await picker.pickImage(source: ImageSource.gallery);
                         if (image != null) {
                           setState(() {
-                            _localAvatarPath = image.path;
+                            _localAvatarFile = image;
                           });
                         }
                       },

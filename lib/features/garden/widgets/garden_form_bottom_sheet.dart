@@ -1,4 +1,5 @@
-import 'dart:io';
+import 'dart:io' as io;
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -26,7 +27,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
   late TextEditingController _descCtrl;
   late TextEditingController _locCtrl;
 
-  String? _localImagePath;
+  XFile? _localImageFile;
   String? _currentImageUrl;
 
   @override
@@ -51,7 +52,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
     final image = await picker.pickImage(source: ImageSource.gallery, imageQuality: 80);
     if (image != null) {
       setState(() {
-        _localImagePath = image.path;
+        _localImageFile = image;
       });
     }
   }
@@ -69,7 +70,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
           name: _nameCtrl.text.trim(),
           location: _locCtrl.text.trim(),
           description: _descCtrl.text.trim(),
-          imagePath: _localImagePath,
+          imageFile: _localImageFile,
           currentImageUrl: _currentImageUrl,
         );
         if (mounted) AppSnackbar.showSuccess(context, 'Cập nhật vườn thành công');
@@ -78,7 +79,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
           name: _nameCtrl.text.trim(),
           location: _locCtrl.text.trim(),
           description: _descCtrl.text.trim(),
-          imagePath: _localImagePath,
+          imageFile: _localImageFile,
         );
         if (mounted) AppSnackbar.showSuccess(context, 'Thêm vườn mới thành công');
       }
@@ -201,13 +202,14 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
   }
 
   Widget _buildImagePreview() {
-    if (_localImagePath != null) {
+    if (_localImageFile != null) {
       return Stack(
         fit: StackFit.expand,
         children: [
-          kIsWeb
-              ? Image.network(_localImagePath!, fit: BoxFit.cover)
-              : Image.file(File(_localImagePath!), fit: BoxFit.cover),
+          Image(
+            image: kIsWeb ? NetworkImage(_localImageFile!.path) : FileImage(io.File(_localImageFile!.path)) as ImageProvider,
+            fit: BoxFit.cover,
+          ),
           _buildClearImageIcon(),
         ],
       );
@@ -239,7 +241,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
       child: GestureDetector(
         onTap: () {
           setState(() {
-            _localImagePath = null;
+            _localImageFile = null;
             _currentImageUrl = null;
           });
         },

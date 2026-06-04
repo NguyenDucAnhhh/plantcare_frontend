@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:image_picker/image_picker.dart';
 import '../data/plant_repository.dart';
 import '../models/plant_model.dart';
 
@@ -50,13 +51,13 @@ class PlantNotifier extends StateNotifier<PlantState> {
     String? species,
     String? description,
     String? datePlanted,
-    String? imagePath,
+    XFile? imageFile,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       String? imageUrl;
-      if (imagePath != null) {
-        imageUrl = await _repository.uploadPlantImage(imagePath);
+      if (imageFile != null) {
+        imageUrl = await _repository.uploadPlantImage(imageFile);
       }
       final newPlant = PlantModel(
         id: 0,
@@ -82,14 +83,14 @@ class PlantNotifier extends StateNotifier<PlantState> {
     String? species,
     String? description,
     String? datePlanted,
-    String? imagePath,
+    XFile? imageFile,
     String? currentImageUrl,
   }) async {
     state = state.copyWith(isLoading: true, clearError: true);
     try {
       String? imageUrl = currentImageUrl;
-      if (imagePath != null && !imagePath.startsWith('http')) {
-        imageUrl = await _repository.uploadPlantImage(imagePath);
+      if (imageFile != null) {
+        imageUrl = await _repository.uploadPlantImage(imageFile);
       }
       final updated = PlantModel(
         id: plantId,
