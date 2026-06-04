@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/widgets/custom_bottom_sheet_form.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../models/reminder_model.dart';
 import '../providers/plant_provider.dart';
 import '../providers/reminder_provider.dart';
@@ -219,28 +220,35 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
     final lastPerformedIso = _getLastPerformedIso();
 
     final notifier = ref.read(reminderProvider(widget.gardenId).notifier);
-    bool success;
+    
+    try {
+      if (widget.reminder == null) {
+        await notifier.addReminder(
+          plantId: _selectedPlantId!,
+          type: _selectedType,
+          triggerTime: timeStr,
+          repeatDays: repeatStr,
+          lastPerformed: lastPerformedIso,
+        );
+        if (mounted) AppSnackbar.showSuccess(context, 'Thêm lịch nhắc nhở thành công');
+      } else {
+        await notifier.updateReminder(
+          reminderId: widget.reminder!.id,
+          type: _selectedType,
+          triggerTime: timeStr,
+          repeatDays: repeatStr,
+          lastPerformed: lastPerformedIso,
+        );
+        if (mounted) AppSnackbar.showSuccess(context, 'Cập nhật lịch nhắc nhở thành công');
+      }
 
-    if (widget.reminder == null) {
-      success = await notifier.addReminder(
-        plantId: _selectedPlantId!,
-        type: _selectedType,
-        triggerTime: timeStr,
-        repeatDays: repeatStr,
-        lastPerformed: lastPerformedIso,
-      );
-    } else {
-      success = await notifier.updateReminder(
-        reminderId: widget.reminder!.id,
-        type: _selectedType,
-        triggerTime: timeStr,
-        repeatDays: repeatStr,
-        lastPerformed: lastPerformedIso,
-      );
-    }
-
-    if (success && mounted) {
-      Navigator.pop(context);
+      if (mounted) {
+        Navigator.pop(context);
+      }
+    } catch (e) {
+      if (mounted) {
+        AppSnackbar.showError(context, ErrorMapper.parseError(e));
+      }
     }
   }
 
@@ -425,9 +433,9 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
                     width: double.infinity,
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.08),
+                      color: AppColors.primary.withValues(alpha: 0.08),
                       borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: AppColors.primary.withOpacity(0.2)),
+                      border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
                     ),
                     child: Row(
                       children: [

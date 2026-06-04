@@ -248,7 +248,7 @@ class _GardenFormBottomSheetState extends ConsumerState<GardenFormBottomSheet> {
         child: Container(
           padding: const EdgeInsets.all(4),
           decoration: BoxDecoration(
-            color: Colors.black.withOpacity(0.55),
+            color: Colors.black.withValues(alpha: 0.55),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.close, color: Colors.white, size: 16),

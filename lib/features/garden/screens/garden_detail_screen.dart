@@ -91,7 +91,7 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
                           await ref.read(gardenProvider.notifier).deleteGarden(currentGarden.id);
                           if (context.mounted) {
                             Navigator.pop(context); // Pop GardenDetailScreen
-                            AppSnackbar.showSuccess(context, 'Đã xóa vườn');
+                            AppSnackbar.showSuccess(context, 'Xóa vườn thành công');
                           }
                         } catch (e) {
                           if (context.mounted) {
@@ -213,7 +213,7 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
           border: Border.all(color: Colors.grey.shade200),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -387,7 +387,7 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
             border: Border.all(color: Colors.grey.shade200),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 10,
                 offset: const Offset(0, 2),
               ),

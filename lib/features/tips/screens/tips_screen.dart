@@ -88,7 +88,7 @@ class _TipsScreenState extends ConsumerState<TipsScreen> {
                           selected: isSelected,
                           onSelected: (_) => _onCategorySelected(category),
                           backgroundColor: Colors.white,
-                          selectedColor: AppColors.primary.withOpacity(0.15),
+                          selectedColor: AppColors.primary.withValues(alpha: 0.15),
                           labelStyle: AppTextStyles.body.copyWith(
                             color: isSelected ? AppColors.primary : AppColors.textGrey,
                             fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -147,7 +147,7 @@ class _TipsScreenState extends ConsumerState<TipsScreen> {
                                     border: Border.all(color: Colors.grey.shade200),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.03),
+                                        color: Colors.black.withValues(alpha: 0.03),
                                         blurRadius: 10,
                                         offset: const Offset(0, 2),
                                       ),
@@ -183,7 +183,7 @@ class _TipsScreenState extends ConsumerState<TipsScreen> {
                                                 Container(
                                                   padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                                                   decoration: BoxDecoration(
-                                                    color: AppColors.accentBlue.withOpacity(0.1),
+                                                    color: AppColors.accentBlue.withValues(alpha: 0.1),
                                                     borderRadius: BorderRadius.circular(8),
                                                   ),
                                                   child: Text(

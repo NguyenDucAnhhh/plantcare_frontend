@@ -267,7 +267,7 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
                           gradient: LinearGradient(
-                            colors: [AppColors.primary.withOpacity(0.8), const Color(0xFF43A047)],
+                            colors: [AppColors.primary.withValues(alpha: 0.8), const Color(0xFF43A047)],
                           ),
                           borderRadius: BorderRadius.circular(16),
                         ),
@@ -445,7 +445,7 @@ class _AdminDiagnosesScreenState extends ConsumerState<AdminDiagnosesScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.15),
+        color: color.withValues(alpha: 0.15),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Text(

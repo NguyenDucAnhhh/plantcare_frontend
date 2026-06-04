@@ -6,6 +6,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../../../core/widgets/custom_bottom_sheet_form.dart';
 import '../models/plant_model.dart';
 import '../providers/plant_provider.dart';
@@ -120,6 +121,9 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
     if (success && mounted) {
       if (widget.plant == null) {
         ref.read(gardenProvider.notifier).updateSinglePlantCount(widget.gardenId, isIncrement: true);
+        AppSnackbar.showSuccess(context, 'Thêm cây mới thành công');
+      } else {
+        AppSnackbar.showSuccess(context, 'Cập nhật cây thành công');
       }
       Navigator.pop(context);
     }
@@ -228,7 +232,7 @@ class _PlantFormBottomSheetState extends ConsumerState<PlantFormBottomSheet> {
               child: Container(
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(
-                  color: Colors.black.withOpacity(0.55),
+                  color: Colors.black.withValues(alpha: 0.55),
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.close, color: Colors.white, size: 16),

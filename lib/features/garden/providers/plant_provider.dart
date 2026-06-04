@@ -2,6 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 import '../data/plant_repository.dart';
 import '../models/plant_model.dart';
+import '../../../core/utils/error_mapper.dart';
 
 class PlantState {
   final bool isLoading;
@@ -72,7 +73,7 @@ class PlantNotifier extends StateNotifier<PlantState> {
       state = state.copyWith(isLoading: false, plants: [created, ...state.plants]);
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(isLoading: false, error: ErrorMapper.parseError(e));
       return false;
     }
   }
@@ -106,7 +107,7 @@ class PlantNotifier extends StateNotifier<PlantState> {
       state = state.copyWith(isLoading: false, plants: updatedList);
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
+      state = state.copyWith(isLoading: false, error: ErrorMapper.parseError(e));
       return false;
     }
   }
@@ -120,8 +121,8 @@ class PlantNotifier extends StateNotifier<PlantState> {
       await _repository.deletePlant(plantId);
       return true;
     } catch (e) {
-      state = state.copyWith(plants: previousList, error: 'Xóa cây thất bại: $e');
-      return false;
+      state = state.copyWith(plants: previousList);
+      rethrow;
     }
   }
 
@@ -134,8 +135,8 @@ class PlantNotifier extends StateNotifier<PlantState> {
       await _repository.movePlant(plantId, targetGardenId);
       return true;
     } catch (e) {
-      state = state.copyWith(plants: previousList, error: 'Chuyển cây thất bại: $e');
-      return false;
+      state = state.copyWith(plants: previousList);
+      rethrow;
     }
   }
 }

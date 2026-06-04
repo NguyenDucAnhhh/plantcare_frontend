@@ -134,7 +134,7 @@ class AdminLayoutShell extends ConsumerWidget {
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
       decoration: BoxDecoration(
-        color: isActive ? Colors.white.withOpacity(0.15) : Colors.transparent,
+        color: isActive ? Colors.white.withValues(alpha: 0.15) : Colors.transparent,
         borderRadius: BorderRadius.circular(8),
       ),
       child: ListTile(

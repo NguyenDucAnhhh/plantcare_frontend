@@ -278,7 +278,7 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
           padding: const EdgeInsets.all(20),
           decoration: BoxDecoration(
             gradient: LinearGradient(
-              colors: [AppColors.primary.withOpacity(0.8), const Color(0xFF43A047)],
+              colors: [AppColors.primary.withValues(alpha: 0.8), const Color(0xFF43A047)],
             ),
             borderRadius: BorderRadius.circular(16),
           ),
@@ -421,7 +421,7 @@ class _DiagnosisScreenState extends ConsumerState<DiagnosisScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         decoration: BoxDecoration(
-          color: isSelected ? color.withOpacity(0.1) : Colors.white,
+          color: isSelected ? color.withValues(alpha: 0.1) : Colors.white,
           borderRadius: BorderRadius.circular(12),
           border: Border.all(
             color: isSelected ? color : Colors.grey.shade300,

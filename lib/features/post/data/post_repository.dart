@@ -1,4 +1,4 @@
-import 'dart:io';
+
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/network/api_client.dart';
@@ -31,9 +31,6 @@ class PostRepository {
       }
       return [];
     } on DioException catch (e) {
-      if (e.response?.statusCode == 401 || e.response?.statusCode == 403) {
-        throw Exception('Phiên đăng nhập đã hết hạn. Vui lòng vào Cài đặt -> Đăng xuất và Đăng nhập lại.');
-      }
       throw Exception('Lỗi khi lấy danh sách bài đăng: $e');
     } catch (e) {
       throw Exception('Lỗi không xác định: $e');

@@ -35,26 +35,6 @@ class ErrorMapper {
           return 'Tài khoản không tồn tại!';
         case 'USER_WRONG_OLD_PASSWORD':
           return 'Mật khẩu cũ không chính xác!';
-        case 'USER_CANNOT_FOLLOW_SELF':
-          return 'Bạn không thể tự theo dõi chính mình!';
-
-        // --- Permissions & Access ---
-        case 'FORBIDDEN_DELETE_COMMENT':
-          return 'Bạn không có quyền xóa bình luận này!';
-        case 'FORBIDDEN_RATE_DIAGNOSIS':
-          return 'Bạn không có quyền đánh giá chẩn đoán này!';
-        case 'FORBIDDEN_GARDEN_ACCESS':
-          return 'Bạn không có quyền truy cập hoặc thao tác trên khu vườn này!';
-        case 'FORBIDDEN_NOTIFICATION_ACCESS':
-          return 'Bạn không có quyền thao tác thông báo này!';
-        case 'FORBIDDEN_PLANT_ACCESS':
-          return 'Bạn không có quyền truy cập hoặc thao tác với cây này!';
-        case 'FORBIDDEN_EDIT_POST':
-          return 'Bạn không có quyền sửa bài đăng của người khác!';
-        case 'FORBIDDEN_DELETE_POST':
-          return 'Bạn không có quyền xóa bài đăng của người khác!';
-        case 'FORBIDDEN_EDIT_REMINDER':
-          return 'Bạn không có quyền sửa báo thức này!';
         
         // --- Content ---
         case 'POST_HIDDEN':

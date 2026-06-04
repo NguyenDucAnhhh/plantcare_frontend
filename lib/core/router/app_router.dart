@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/auth/screens/login_screen.dart';
@@ -34,8 +35,11 @@ import '../../core/storage/secure_storage.dart';
 
 /// GoRouter SINGLETON - chi tao 1 lan duy nhat, KHONG bi recreate
 /// Su dung async redirect thay vi watch Provider de tranh reset ve initialLocation
+final GlobalKey<NavigatorState> rootNavigatorKey = GlobalKey<NavigatorState>();
+
 final appRouterProvider = Provider<GoRouter>((ref) {
   return GoRouter(
+    navigatorKey: rootNavigatorKey,
     initialLocation: '/login',
     debugLogDiagnostics: false,
 

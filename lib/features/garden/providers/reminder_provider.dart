@@ -67,8 +67,8 @@ class ReminderNotifier extends StateNotifier<ReminderState> {
       );
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      return false;
+      state = state.copyWith(isLoading: false);
+      rethrow;
     }
   }
 
@@ -88,12 +88,12 @@ class ReminderNotifier extends StateNotifier<ReminderState> {
         'lastPerformed': lastPerformed,
       };
       final updated = await _repository.updateReminder(reminderId, data);
-      final updatedList = state.reminders.map((r) => r.id == reminderId ? updated : r).toList();
-      state = state.copyWith(isLoading: false, reminders: updatedList);
+      final newList = state.reminders.map((r) => r.id == reminderId ? updated : r).toList();
+      state = state.copyWith(isLoading: false, reminders: newList);
       return true;
     } catch (e) {
-      state = state.copyWith(isLoading: false, error: e.toString());
-      return false;
+      state = state.copyWith(isLoading: false);
+      rethrow;
     }
   }
 

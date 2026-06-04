@@ -67,7 +67,7 @@ class PostCard extends ConsumerWidget {
           border: isDetailView ? null : Border.all(color: Colors.grey.shade200),
           boxShadow: isDetailView ? [] : [
             BoxShadow(
-              color: Colors.black.withOpacity(0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 10,
               offset: const Offset(0, 2),
             )
@@ -275,7 +275,7 @@ class _ImageCarouselState extends State<_ImageCarousel> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(
-              color: Colors.black.withOpacity(0.6),
+              color: Colors.black.withValues(alpha: 0.6),
               borderRadius: BorderRadius.circular(16),
             ),
             child: Text(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../core/constants/app_text_styles.dart';
 import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../models/plant_model.dart';
 import '../models/garden_model.dart';
 import '../providers/plant_provider.dart';
@@ -90,20 +91,26 @@ class _MoveTreeDialogState extends ConsumerState<MoveTreeDialog> {
                 onPressed: _selectedGardenId == null || plantState.isLoading
                     ? null
                     : () async {
-                        final success = await ref
-                            .read(plantProvider(widget.plant.gardenId).notifier)
-                            .movePlant(widget.plant.id, _selectedGardenId!);
-                        if (success && context.mounted) {
-                          // Cap nhat so luong cay o 2 vuon trong gardenProvider
-                          ref.read(gardenProvider.notifier).updatePlantCountOnMove(
-                            widget.plant.gardenId, 
-                            _selectedGardenId!
-                          );
+                        try {
+                          final success = await ref
+                              .read(plantProvider(widget.plant.gardenId).notifier)
+                              .movePlant(widget.plant.id, _selectedGardenId!);
+                          if (success && context.mounted) {
+                            // Cap nhat so luong cay o 2 vuon trong gardenProvider
+                            ref.read(gardenProvider.notifier).updatePlantCountOnMove(
+                              widget.plant.gardenId, 
+                              _selectedGardenId!
+                            );
 
-                          ref.invalidate(reminderProvider(widget.plant.gardenId));
-                          ref.invalidate(reminderProvider(_selectedGardenId!));
-                          Navigator.pop(context);
-                          AppSnackbar.showSuccess(context, 'Chuyển cây thành công!');
+                            ref.invalidate(reminderProvider(widget.plant.gardenId));
+                            ref.invalidate(reminderProvider(_selectedGardenId!));
+                            Navigator.pop(context);
+                            AppSnackbar.showSuccess(context, 'Chuyển cây thành công!');
+                          }
+                        } catch (e) {
+                          if (context.mounted) {
+                            AppSnackbar.showError(context, ErrorMapper.parseError(e));
+                          }
                         }
                       },
                 style: ElevatedButton.styleFrom(

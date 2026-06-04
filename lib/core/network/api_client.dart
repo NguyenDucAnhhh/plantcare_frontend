@@ -1,7 +1,10 @@
 import 'package:dio/dio.dart';
+import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../constants/api_constants.dart';
 import '../storage/secure_storage.dart';
+import '../router/app_router.dart';
+import '../utils/app_snackbar.dart';
 
 /// Nha may san xuat Dio - Cau hinh HTTP Client dung cho toan app
 /// Moi request gui di deu qua day: tu dong gan Token, xu ly loi chung
@@ -114,11 +117,15 @@ class _AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    // Neu Server tra ve 401 (Token het han), xoa Token cu va chuyen ve man Dang nhap
-    if (err.response?.statusCode == 401) {
-      SecureStorage.clear();
-      // Ghi chu: Viec chuyen man hinh se xu ly o lop Router
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
+    // Neu Server tra ve 401 (Token het han) hoac 403 (Bi xoa/khoa)
+    if (err.response?.statusCode == 401 || err.response?.statusCode == 403) {
+      await SecureStorage.clear();
+      final context = rootNavigatorKey.currentContext;
+      if (context != null && context.mounted) {
+        context.go('/login');
+        AppSnackbar.showError(context, 'Vui lòng đăng nhập lại!');
+      }
     }
     handler.next(err);
   }

@@ -92,7 +92,7 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
         border: Border.all(color: Colors.grey.shade200),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -127,7 +127,7 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
                 child: Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.9),
+                    color: Colors.white.withValues(alpha: 0.9),
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
@@ -220,11 +220,20 @@ class _GardenScreenState extends ConsumerState<GardenScreen> {
   void _showDeleteDialog(BuildContext context, GardenModel garden) {
     showDialog(
       context: context,
-      builder: (context) => ConfirmDeleteDialog(
+      builder: (dialogContext) => ConfirmDeleteDialog(
         title: 'Xác nhận xóa vườn',
         content: 'Bạn có chắc chắn muốn xóa vườn ${garden.name} không?\nTất cả cây trong vườn cũng sẽ bị xóa. Hành động này không thể hoàn tác.',
         onConfirm: () async {
-          await ref.read(gardenProvider.notifier).deleteGarden(garden.id);
+          try {
+            await ref.read(gardenProvider.notifier).deleteGarden(garden.id);
+            if (context.mounted) {
+              AppSnackbar.showSuccess(context, 'Xóa vườn thành công');
+            }
+          } catch (e) {
+            if (context.mounted) {
+              AppSnackbar.showError(context, ErrorMapper.parseError(e));
+            }
+          }
         },
       ),
     );

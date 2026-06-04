@@ -162,7 +162,7 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
                           Container(
                             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                             decoration: BoxDecoration(
-                              color: AppColors.accentBlue.withOpacity(0.1),
+                              color: AppColors.accentBlue.withValues(alpha: 0.1),
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(tip.category ?? 'Chung', style: const TextStyle(color: AppColors.accentBlue, fontSize: 12)),

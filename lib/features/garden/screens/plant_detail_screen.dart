@@ -3,6 +3,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_text_styles.dart';
+import '../../../core/utils/app_snackbar.dart';
+import '../../../core/utils/error_mapper.dart';
 import '../models/plant_model.dart';
 import '../models/garden_model.dart';
 import '../models/reminder_model.dart';
@@ -451,15 +453,22 @@ class _PlantDetailScreenState extends ConsumerState<PlantDetailScreen> {
   void _showDeletePlant(BuildContext context) {
     showDialog(
       context: context,
-      builder: (_) => ConfirmDeleteDialog(
+      builder: (dialogContext) => ConfirmDeleteDialog(
         title: 'Xác nhận xóa cây',
         content: 'Bạn có chắc chắn muốn xóa cây ${_currentPlant.name} không?\nHành động này không thể hoàn tác.',
         onConfirm: () async {
-          final success = await ref.read(plantProvider(widget.garden.id).notifier).deletePlant(_currentPlant.id);
-          if (success) {
+          try {
+            await ref.read(plantProvider(widget.garden.id).notifier).deletePlant(_currentPlant.id);
             ref.read(gardenProvider.notifier).updateSinglePlantCount(widget.garden.id, isIncrement: false);
+            if (context.mounted) {
+              Navigator.pop(context); // Pop PlantDetailScreen
+              AppSnackbar.showSuccess(context, 'Xóa cây thành công');
+            }
+          } catch (e) {
+            if (context.mounted) {
+              AppSnackbar.showError(context, ErrorMapper.parseError(e));
+            }
           }
-          if (context.mounted) Navigator.of(context).pop();
         },
       ),
     );
