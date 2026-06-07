@@ -111,7 +111,7 @@ class _AdminTipsScreenState extends ConsumerState<AdminTipsScreen> {
         Expanded(
           child: tipsAsync.when(
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (err, stack) => Center(child: Text('Lỗi: $err')),
+            error: (err, stack) => const SizedBox.shrink(),
             data: (dataMap) {
               final tipsList = (dataMap['content'] as List<dynamic>?)?.cast<CareTipModel>() ?? [];
               final totalElements = dataMap['totalElements'] as int? ?? tipsList.length;

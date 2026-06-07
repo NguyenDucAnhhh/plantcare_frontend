@@ -165,91 +165,88 @@ class _PostDetailScreenState extends ConsumerState<PostDetailScreen> {
             ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: RefreshIndicator(
-              onRefresh: _onRefresh,
-              color: AppColors.primary,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // Bai dang
-                    PostCard(post: post, isDetailView: true),
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 680),
+          child: Column(
+            children: [
+              Expanded(
+                child: RefreshIndicator(
+                  onRefresh: _onRefresh,
+                  color: AppColors.primary,
+                  child: SingleChildScrollView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Bai dang
+                        PostCard(post: post, isDetailView: true),
 
-                    Divider(
-                      color: Colors.grey.shade200,
-                      thickness: 8,
-                      height: 8,
-                    ),
+                        Divider(
+                          color: Colors.grey.shade200,
+                          thickness: 8,
+                          height: 8,
+                        ),
 
-                    // Binh luan Header
-                    Padding(
-                      padding: const EdgeInsets.all(16),
-                      child: Text(
-                        'Bình luận (${commentsAsync.value?.length ?? 0})',
-                        style: AppTextStyles.heading2.copyWith(fontSize: 18),
-                      ),
-                    ),
+                        // Binh luan Header
+                        Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Text(
+                            'Bình luận (${commentsAsync.value?.length ?? 0})',
+                            style: AppTextStyles.heading2.copyWith(fontSize: 18),
+                          ),
+                        ),
 
-                    // Danh sach binh luan
-                    commentsAsync.when(
-                      data: (comments) {
-                        if (comments.isEmpty) {
-                          return Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Text(
-                              'Chưa có bình luận nào.',
-                              style: AppTextStyles.bodyGrey,
-                            ),
-                          );
-                        }
-                        final topLevelComments = comments
-                            .where((c) => c.parentCommentId == null)
-                            .toList();
-                        return ListView.separated(
-                          shrinkWrap: true,
-                          physics: const NeverScrollableScrollPhysics(),
-                          itemCount: topLevelComments.length,
-                          separatorBuilder: (_, _) =>
-                              Divider(color: Colors.grey.shade200, height: 1),
-                          itemBuilder: (context, index) {
-                            return _buildCommentThread(
-                              topLevelComments[index],
-                              comments,
+                        // Danh sach binh luan
+                        commentsAsync.when(
+                          data: (comments) {
+                            if (comments.isEmpty) {
+                              return Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Text(
+                                  'Chưa có bình luận nào.',
+                                  style: AppTextStyles.bodyGrey,
+                                ),
+                              );
+                            }
+                            final topLevelComments = comments
+                                .where((c) => c.parentCommentId == null)
+                                .toList();
+                            return ListView.separated(
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemCount: topLevelComments.length,
+                              separatorBuilder: (_, _) =>
+                                  Divider(color: Colors.grey.shade200, height: 1),
+                              itemBuilder: (context, index) {
+                                return _buildCommentThread(
+                                  topLevelComments[index],
+                                  comments,
+                                );
+                              },
                             );
                           },
-                        );
-                      },
-                      loading: () => const Center(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
+                          loading: () => const Center(
+                            child: Padding(
+                              padding: EdgeInsets.all(16),
+                              child: CircularProgressIndicator(
+                                color: AppColors.primary,
+                              ),
+                            ),
                           ),
+                          error: (err, stack) => const SizedBox.shrink(),
                         ),
-                      ),
-                      error: (err, stack) => Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Text(
-                          'Lỗi tải bình luận: $err',
-                          style: AppTextStyles.body.copyWith(
-                            color: AppColors.error,
-                          ),
-                        ),
-                      ),
+                        const SizedBox(height: 24),
+                      ],
                     ),
-                    const SizedBox(height: 24),
-                  ],
+                  ),
                 ),
-              ),
-            ),
-          ), // Closing parenthesis for RefreshIndicator
-          // O nhap binh luan
-          _buildCommentInput(myAvatarUrl),
-        ],
+              ), // Closing parenthesis for RefreshIndicator
+              // O nhap binh luan
+              _buildCommentInput(myAvatarUrl),
+            ],
+          ),
+        ),
       ),
     );
   }

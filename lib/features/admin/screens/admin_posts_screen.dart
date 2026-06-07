@@ -105,7 +105,7 @@ class _AdminPostsScreenState extends ConsumerState<AdminPostsScreen> {
               );
             },
             loading: () => const Center(child: CircularProgressIndicator()),
-            error: (e, st) => Center(child: Text('Lỗi: $e')),
+            error: (e, st) => const SizedBox.shrink(),
           ),
         ),
       ],

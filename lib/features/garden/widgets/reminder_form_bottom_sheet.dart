@@ -210,7 +210,8 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
     }
 
     final count = _repeatCountCtrl.text.trim();
-    if (count.isEmpty || int.tryParse(count) == null) {
+    final parsedCount = int.tryParse(count);
+    if (count.isEmpty || parsedCount == null || parsedCount <= 0) {
       AppSnackbar.showError(context, 'Vui lòng nhập số lặp lại hợp lệ');
       return;
     }

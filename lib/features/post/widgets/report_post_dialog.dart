@@ -35,13 +35,13 @@ class _ReportPostDialogState extends ConsumerState<ReportPostDialog> {
           mainAxisSize: MainAxisSize.min,
           children: [
             Text(
-              'Báo cáo bài đăng',
+              'Tố cáo bài đăng',
               style: AppTextStyles.heading2.copyWith(fontSize: 20),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
-              'Bạn có chắc chắn muốn báo cáo bài đăng này? Chúng tôi sẽ xem xét và xử lý phù hợp.',
+              'Bạn có chắc chắn muốn tố cáo bài đăng này? Chúng tôi sẽ xem xét và xử lý phù hợp.',
               style: AppTextStyles.bodyGrey.copyWith(height: 1.4),
               textAlign: TextAlign.center,
             ),
@@ -55,7 +55,7 @@ class _ReportPostDialogState extends ConsumerState<ReportPostDialog> {
                 controller: _reasonCtrl,
                 maxLines: 4,
                 decoration: InputDecoration(
-                  hintText: 'Nội dung báo cáo',
+                  hintText: 'Nội dung tố cáo',
                   hintStyle: AppTextStyles.bodyGrey,
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.all(16),
@@ -86,7 +86,7 @@ class _ReportPostDialogState extends ConsumerState<ReportPostDialog> {
                         await ref.read(postProvider.notifier).reportPost(widget.postId, _reasonCtrl.text);
                         if (context.mounted) {
                           Navigator.pop(context);
-                          AppSnackbar.showSuccess(context, 'Đã gửi báo cáo thành công');
+                          AppSnackbar.showSuccess(context, 'Đã gửi tố cáo thành công');
                         }
                       } catch (e) {
                         if (context.mounted) {
@@ -101,7 +101,7 @@ class _ReportPostDialogState extends ConsumerState<ReportPostDialog> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       elevation: 0,
                     ),
-                    child: Text('Báo cáo', style: AppTextStyles.button),
+                    child: Text('Tố cáo', style: AppTextStyles.button),
                   ),
                 ),
               ],

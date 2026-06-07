@@ -141,11 +141,7 @@ class AuthNotifier extends StateNotifier<AuthState> {
 
   /// Dich ma loi tu Spring Boot sang tieng Viet de hien thi cho User
   String _parseError(DioException e) {
-    final errorCode = e.response?.data?['error'];
-    final serverMessage = e.response?.data?['message'];
-
-    // Su dung ErrorMapper tap trung cho toan bo he thong (Cach 1)
-    return ErrorMapper.getErrorMessage(errorCode, serverMessage);
+    return ErrorMapper.parseError(e);
   }
 }
 

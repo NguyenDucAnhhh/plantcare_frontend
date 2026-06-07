@@ -35,7 +35,7 @@ class AdminDashboardScreen extends ConsumerWidget {
             ],
           ),
           loading: () => const Center(child: CircularProgressIndicator()),
-          error: (e, st) => Text('Lỗi tải dữ liệu: $e', style: const TextStyle(color: Colors.red)),
+          error: (e, st) => const SizedBox.shrink(),
         ),
       ],
       ),

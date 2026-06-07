@@ -524,7 +524,17 @@ class _GardenDetailScreenState extends ConsumerState<GardenDetailScreen> {
       builder: (_) => ConfirmDeleteDialog(
         title: 'Xác nhận xóa lịch',
         content: 'Bạn có chắc chắn muốn xóa lịch ${_getNameForType(reminder.type).toLowerCase()} không?\nHành động này không thể hoàn tác.',
-        onConfirm: () async => ref.read(reminderProvider(widget.garden.id).notifier).deleteReminder(reminder.id),
+        onConfirm: () async {
+          final success = await ref.read(reminderProvider(widget.garden.id).notifier).deleteReminder(reminder.id);
+          if (context.mounted) {
+            if (success) {
+              AppSnackbar.showSuccess(context, 'Xóa lịch chăm sóc thành công');
+            } else {
+              final error = ref.read(reminderProvider(widget.garden.id)).error;
+              AppSnackbar.showError(context, ErrorMapper.parseError(error ?? 'Xóa thất bại'));
+            }
+          }
+        },
       ),
     );
   }

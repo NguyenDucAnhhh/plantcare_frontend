@@ -134,7 +134,7 @@ class PostNotifier extends StateNotifier<PostState> {
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
-      throw Exception('Lỗi tạo bài đăng: $e');
+      rethrow;
     }
   }
 
@@ -160,18 +160,22 @@ class PostNotifier extends StateNotifier<PostState> {
       );
     } catch (e) {
       state = state.copyWith(isLoading: false);
-      throw Exception('Lỗi sửa bài đăng: $e');
+      rethrow;
     }
   }
 
   Future<void> deletePost(String postId) async {
+    // Optimistic delete: Xóa khỏi UI trước
+    final previousList = List<PostModel>.from(state.posts);
+    final updatedList = state.posts.where((p) => p.id != postId).toList();
+    state = state.copyWith(posts: updatedList);
+
     try {
       await _repository.deletePost(postId);
-      state = state.copyWith(
-        posts: state.posts.where((p) => p.id != postId).toList(),
-      );
     } catch (e) {
-      throw Exception('Lỗi xóa bài đăng: $e');
+      // Nếu lỗi, khôi phục lại danh sách cũ và ném nguyên lỗi ra ngoài UI
+      state = state.copyWith(posts: previousList);
+      rethrow;
     }
   }
 
@@ -194,7 +198,7 @@ class PostNotifier extends StateNotifier<PostState> {
       await _repository.toggleLike(postId);
     } catch (e) {
       state = state.copyWith(posts: previousPosts);
-      throw Exception('Lỗi thả tim: $e');
+      rethrow;
     }
   }
 
@@ -213,7 +217,7 @@ class PostNotifier extends StateNotifier<PostState> {
     try {
       await _repository.reportPost(postId, reason);
     } catch (e) {
-      throw Exception('Lỗi khi báo cáo bài đăng: $e');
+      rethrow;
     }
   }
 }

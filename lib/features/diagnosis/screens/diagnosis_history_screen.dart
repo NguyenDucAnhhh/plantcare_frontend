@@ -41,7 +41,7 @@ class DiagnosisHistoryScreen extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Đã có lỗi xảy ra: $error'),
+              const Text('Không thể tải lịch sử chẩn đoán lúc này.'),
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => ref.read(diagnosisHistoryProvider.notifier).fetchHistory(),

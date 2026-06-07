@@ -22,6 +22,7 @@ class PostFormBottomSheet extends ConsumerStatefulWidget {
 }
 
 class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
+  final _formKey = GlobalKey<FormState>();
   late TextEditingController _contentController;
   final ImagePicker _picker = ImagePicker();
   final List<XFile> _selectedImages = [];
@@ -59,6 +60,11 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
       if (images.isNotEmpty) {
         setState(() {
           int remainingSlots = 4 - _existingImageUrls.length - _selectedImages.length;
+          if (images.length > remainingSlots) {
+            if (mounted) {
+              AppSnackbar.showError(context, 'Chỉ được chọn tối đa 4 ảnh');
+            }
+          }
           for (var i = 0; i < images.length && i < remainingSlots; i++) {
             _selectedImages.add(images[i]);
           }
@@ -82,7 +88,7 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
   }
 
   Future<void> _submit() async {
-    if (_contentController.text.trim().isEmpty) return;
+    if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
     
     try {
@@ -106,7 +112,7 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
       ref.read(profileProvider.notifier).loadProfileData();
 
       if (mounted) {
-        AppSnackbar.showSuccess(context, isEdit ? 'Cập nhật thành công' : 'Đăng bài thành công');
+        AppSnackbar.showSuccess(context, isEdit ? 'Cập nhật bài đăng thành công!' : 'Đăng bài thành công!');
         Navigator.pop(context);
       }
     } catch (e) {
@@ -127,20 +133,28 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
       actionLabel: isEdit ? 'Lưu bài đăng' : 'Đăng bài',
       onActionPressed: _submit,
       isActionLoading: _isLoading,
-      content: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Text Area
+      content: Form(
+        key: _formKey,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Text Area
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: AppColors.inputBg,
                 borderRadius: BorderRadius.circular(12),
               ),
-              child: TextField(
+              child: TextFormField(
                 controller: _contentController,
                 maxLines: 4,
                 minLines: 4,
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Vui lòng nhập nội dung bài đăng';
+                  }
+                  return null;
+                },
                 decoration: InputDecoration(
                   hintText: isEdit ? 'Nội dung bài đăng...' : 'Bạn đang nghĩ gì về vườn cây của mình?',
                   hintStyle: AppTextStyles.bodyGrey,
@@ -285,6 +299,7 @@ class _PostFormBottomSheetState extends ConsumerState<PostFormBottomSheet> {
               ),
 
         ],
+      ),
       ),
     );
   }
