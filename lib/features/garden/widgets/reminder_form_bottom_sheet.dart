@@ -231,7 +231,7 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
           repeatDays: repeatStr,
           lastPerformed: lastPerformedIso,
         );
-        if (mounted) AppSnackbar.showSuccess(context, 'Thêm lịch nhắc nhở thành công');
+        if (mounted) AppSnackbar.showSuccess(context, 'Thêm lịch chăm sóc thành công');
       } else {
         await notifier.updateReminder(
           reminderId: widget.reminder!.id,
@@ -240,7 +240,7 @@ class _ReminderFormBottomSheetState extends ConsumerState<ReminderFormBottomShee
           repeatDays: repeatStr,
           lastPerformed: lastPerformedIso,
         );
-        if (mounted) AppSnackbar.showSuccess(context, 'Cập nhật lịch nhắc nhở thành công');
+        if (mounted) AppSnackbar.showSuccess(context, 'Cập nhật lịch chăm sóc thành công');
       }
 
       if (mounted) {
