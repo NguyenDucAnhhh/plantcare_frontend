@@ -2,6 +2,8 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'dart:ui';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
+import '../constants/app_colors.dart';
+
 class NotificationService {
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -76,8 +78,8 @@ class NotificationService {
                 channelDescription: 'Kênh này dùng cho các thông báo quan trọng.',
                 importance: Importance.max,
                 priority: Priority.high,
-                largeIcon: DrawableResourceAndroidBitmap('@mipmap/ic_launcher'),
-                color: Color(0xFF4CAF50), // AppColors.primaryLight
+                icon: 'ic_notification',
+                color: AppColors.primaryLight,
               ),
             ),
           );
